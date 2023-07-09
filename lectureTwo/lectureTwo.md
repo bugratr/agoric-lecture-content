@@ -1,132 +1,72 @@
-# Lecture Two - Introduction to ERTP and Zoe
-## Table of Content
+# İkinci Ders - ERTP ve Zoe'ya Giriş
+## İçindekiler
 * ### ERTP
-  * What is an electronic right?
-  * Electronic right vs eright
-  * What is ERTP?
-  * Implementing sample `eright`s
-  * ERTP in Agoric
+  * Elektronik hak nedir?
+  * Elektronik hak vs eright
+  * ERTP nedir?
+  * Örnek `eright`ların uygulanması
+  * Agoric'teki ERTP
 
 * ### Zoe
-  * Context
-  * Structure Of A Zoe Contract
-  * Offers
-  * Two Sides Of Zoe
-  * Contract Development Experience
+  * Bağlam
+  * Bir Zoe Sözleşmesinin Yapısı
+  * Teklifler
+  * Zoe'nin İki Yüzü
+  * Sözleşme Geliştirme Deneyimi
 
 ## ERTP
 
-### What is an electronic right?
-* #### Object Capabilities
-  In order to understand what an `electronic right` is we first need to take a look at the concept called `Object Capabilities`.
+### Elektronik hak nedir?
+* #### Nesne Yetenekleri
+  `Elektronik hak`ın ne olduğunu anlamak için öncelikle `Nesne Yetenekleri` adı verilen konsepta bir göz atmamız gerekiyor.
 
-  ![Figure 1: Granovetter Diagram](../literatureWork/images/granovetterOperator.png)
+  ![Şekil 1: Granovetter Diyagramı](../literatureWork/images/granovetterOperator.png)
 
-  The diagram above demonstrates the social relationships between people and was designed by The sociologist Mark Granovetter. The Object Capabilities 
-discipline refers to this diagram as `Granovetter Operator` and uses it to illustrate the relationships between objects.
+  Yukarıdaki diyagram, insanlar arasındaki sosyal ilişkileri gösterir ve sosyolog Mark Granovetter tarafından tasarlanmıştır. Nesne Yetenekleri disiplini, bu diyagrama `Granovetter Operatörü` adını verir ve nesneler arasındaki ilişkileri göstermek için kullanır.
 
-  In its essence, an `ocaps` (Object Capabilities) system authorizes users according to the object references they have. In an `ocaps` system, there's no 
-Access Control Lists(ACLs). Simply your capabilities are defined by the object references you hold. 
+  Temelinde, bir `ocaps` (Nesne Yetenekleri) sistemi, kullanıcıları sahip oldukları nesne referanslarına göre yetkilendirir. Bir `ocaps` sisteminde, Erişim Kontrol Listeleri(ACLs) yoktur. Basitçe, yetenekleriniz sahip olduğunuz nesne referansları tarafından tanımlanır. 
 
-* #### A Word On 'Rights'
+* #### 'Haklar' Üzerine Bir Söz
 
-  "Rights help people coordinate plans and resolve conflicts over the use of resources.
-Rights partition the space of actions to avoid interference between separately formulated
-plans, thus enabling cooperative relationships despite mutual suspicion and competing
-goals [15]. This rights-based perspective can shed light on the problem of securing distributed computational systems"[2]
+  "Haklar, insanların planları koordine etmelerine ve kaynakların kullanımı üzerinde çıkan çatışmaları çözmelerine yardımcı olur.
+Haklar, ayrı ayrı formüle edilen planlar arasında müdahaleyi önlemek için eylemlerin alanını böler, böylece karşılıklı şüphe ve rekabet eden hedeflere rağmen işbirlikçi ilişkileri mümkün kılar [15]. Bu hak temelli perspektif, dağıtılmış hesaplama sistemlerinin güvenliğini sağlama sorununa ışık tutabilir"[2]
 
-* #### From Objects To Electronic Rights
-  The object references represent a right to perform a set of operations on a specific, designated resource.
-In this context, we can use electronic rights to address the real-world problems which are currently being 
-resolved by the rights we know as `normal`. Using contracts, law, courts, etc.
+* #### Nesnelerden Elektronik Haklara
+  Nesne referansları, belirli, atanmış bir kaynak üzerinde bir dizi işlem yapma hakkını temsil eder.
+Bu bağlamda, şu anda `normal` olarak bildiğimiz haklarla çözülmekte olan gerçek dünya problemlerini adreslemek için elektronik hakları kullanabiliriz. Sözleşmeler, hukuk, mahkemeler vb. kullanarak.
 
-### Electornical right vs eright
-Let's imagine Alice, Bob, and Carol from the `Granovetter Operator` are some objects living in a `ocap` environment.
-- Alice has the `right` to invoke a resource from Carol.
-- Alice knows Bob so she can pass her right to invoke Carol to Bob. Bob has no way of invoking Carol if Alice refuses to
-pass this right to him.
-- Carol has no authority to invoke any resource neither from Alice or Bob.
+### Elektronik hak vs eright
+`Granovetter Operatörü`nden Alice, Bob ve Carol'un bir `ocap` ortamında yaşayan bazı nesneler olduğunu düşünelim.
+- Alice'nin Carol'dan bir kaynağı çağırma `hakkı` vardır.
+- Alice Bob'u tanıdığı için Carol'u çağırma hakkını Bob'a geçirebilir. Alice bu hakkı ona geçirmeyi reddederse, Bob'un Carol'u çağırma yolu yoktur.
+- Carol'un ne Alice'den ne de Bob'dan herhangi bir kaynağı çağırma yetkisi yoktur.
 
-The type of `right` we're inspecting above has these features;
-* Shareable
-* Exercisable
-* Opaque
-* Specific
+Yukarıda incelediğimiz `hak` türünün aşağıdaki özelliklere sahip olduğunu görebiliriz;
+* Paylaşılabilir
+* Uygulanabilir
+* Şeffaf Olmayan
+* Belirli
 
-Here's what Mark Miller has to say about the differences between electronic rights and erights in [erights.org](http://erights.org/smart-contracts/index.html#ERTP);
+İşte Mark Miller'ın elektronik haklar ve erights arasındaki farklar hakkında [erights.org](http://erights.org/smart-contracts/index.html#ERTP) üzerinde söyledikleri;
 
-"_Capabilities are electronic rights of a sort, but by themselves lack 2 crucial features needed for tradable electronic rights:_
+"_Yetenekler, bir tür elektronik haklardır, ancak ticarete konu olabilen elektronik haklar için 2 önemli özellikten yoksundurlar:_
 
-* _Exclusive rights transfer._
-* _Assayability (so a 3rd party can determine if a trade is mutually acceptable)._
+* _Münhasır haklar transferi._
+* _Deneyebilirlik (bu sayede bir 3. tarafın bir takasın karşılıklı kabul edilebilir olup olmadığını belirleyebilmesi)._
 
-_The next layer above distributed capabilities, ERTP, does provide these properties. 
-The ERTP protocol accommodates fungible & non-fungible rights, exclusive & non-exclusive rights, 
-and blinded or non-blinded transfer. **Only electronic rights manipulable via ERTP are called erights.**_"
+_Dağıtılmış yeteneklerin üzerindeki bir sonraki katman olan ERTP, bu özellikleri sağlar. 
+ERTP protokolü, fungible & non-fungible hakları, münhasır & münhasır olmayan hakları, 
+ve kör veya kör olmayan transferi barındırır. **ERTP aracılığıyla manipüle edilebilen yalnızca elektronik haklara erights denir.**_"
 
-So If we compare the rights we inspected above to the definition of `eright` from Mark Miller, we can see that the right
-transfer from `Granovetter Operator` lacks the two main features for an electronic right to be called `eright`. Why?
+Yukarıda incelediğimiz hakları Mark Miller'ın `eright` tanımıyla karşılaştırdığımızda, hakların
+`Granovetter Operatörü`nden olan transferinin, bir elektronik hakkın `eright` olarak adlandırılması için iki ana özelliği eksik olduğunu görebiliriz. Neden?
 
-1. An object reference is shareable but an eright has to be exclusive. What do we mean? <br>
-   If Alice drops the capability after passing it to Bob, Bob
-   happens to have exclusive access to Carol, but this isn’t an __*exclusive*__ right since Bob
-   is unable to know that he is the only one who has it.[1]
-2. A capability is opaque, but an eright has to be assayable. Meaning; <br>
-   Assayability is needed for trade, since you must be able to determine what you would
-   be getting before deciding to purchase. However, exclusive rights can only be reliably
-   assayed by actually obtaining exclusive access to them, since otherwise, after you’ve
-   assayed them, someone else may gain the exclusive, cutting you out. Trade of
-   exclusives may therefore require a trusted third party who can hold them in escrow.[1]
-
-If we're going to trade electronic rights in a distributed environment securely, the common features for all those rights are;
-* Exclusive
-* Assayable
-
-But there are other features for an `eright` can possess;
-* Fungible vs Non-fungible: We can implement both `Money` and something like a `Ticket` as `erights` where money is fungible and a ticket is non-fungible.
-* Exercisable vs Symbolic: Money is symbolic, you cannot do anything with it other than trading it for something else. But something like a `Covered Call Option` is 
-exercisable where you can exercise your right to `Buy` the covered asset before a deadline. Both `Money` and `Covered Call Option` can be implemented as `eright`s.
-
-### What is ERTP?
-ERTP is the protocol that transforms an electronic right into an `eright` by making it `Exclusive` and `Assayable`.
-
-Here are some sample `eright` implementations via ERTP;
-* #### Money
-  [Sample Money Implementation](http://erights.org/elib/capability/ode/ode-capabilities.html#simple-money)
-* #### Covered Call Option
-  [Sample Covered Call Implementation](http://erights.org/elib/capability/ode/ode-bearer.html#options-contract)
-
-### ERTP In Agoric
-> **Note**: This section uses materials(code samples, diagrams, etc.) from [Agoric Docs ERTP](https://docs.agoric.com/guides/ertp/#ertp-concepts-overview).
-> Visit the site for more in-depth learning materials. 
-
-Agoric uses ERTP to trade `eright`s like money, NFTs etc. The version of ERTP Agoric uses has the following structure;
-
-<img src="https://docs.agoric.com/assets/img/relationships1.6963650c.svg" width='60%'>
-
-At the center of the above structure, there are three basic components: `Issuer`, `Mint` and `Brand`. 
-Here's the relationship between these three components;
-
-<img src="https://docs.agoric.com/assets/img/relationships2.392c65c9.svg" width='60%'>
-
-As you can see there's a `one-to-one` relationship between every `Issuer`, `Mint` and `Brand`. 
-
-* **Issuer**: The source of truth for the digital asset. Issuer is the authority everyone trusts when trading
-this currency. Below is a diagram showing how the issuer manages to be the source of truth.
-  <img src="https://user-images.githubusercontent.com/109155000/211854454-65bff5c0-e945-40cb-a2bc-3ff4e177afa5.png" width='60%'>
-* **Brand**: A unique object that is used to identify the digital asset we're working with. Brand information
-can be shared publicly.
-* **Mint**: The only way to print money of the `Brand` associated with this mint object.
-
-This `one-to-one` relationship between `Issuer`, `Mint` and `Brand` is very important to keep the system secure.
-Hence, they're immutable.
-
-There are some other components that we must mention if we're going to talk about ERTP. They are,
-* **Amount**: A representation of the actual asset. Amounts are not money. They're just an abstraction to make working with digital assets secure and easier.
-* **Payment**: The form that an actual digital asset takes during a transfer. 
-* **Purse**: The form of digital asset in a non-transfer state.
-
-Let's take a look at how we can make use of the ERTP protocol to create fungible and non-fungible tokens;
+1. Bir nesne referansı paylaşılabilir ama bir eright münhasır olmalı. Ne demek istiyoruz? <br>
+   Eğer Alice, yeteneğini Bob'a geçirdikten sonra bırakırsa, Bob
+   Carol'a münhasır erişime sahip olur, ancak bu bir __*münhasır*__ hak değildir çünkü Bob
+   onun tek sahibi olduğunu bilemez.[1]
+2. Bir yetenek şeffaf olmayan bir durumdadır, ama bir eright deneyebilir olmalıdır. Anlamı; <br>
+   Deneyebilirlik, ticaret için gereklidir, çünkü satın almayı düşünmeden önce ne elde edeceğinizi belirlemeniz gerekir. Ancak, münhasır haklar yalnızca onlara münhasır eriş
 * ##### How to create fungible tokens with ERTP?
   Initially;
   ```js
@@ -151,133 +91,116 @@ if we want to park our money. To put a payment inside a purse;
   const quatloosPurse = quatloosIssuer.makeEmptyPurse();
   quatloosPurse.deposit(quatloosPayment);
   ```
-
-* ##### How to create non-fungible tokens with ERTP?
-  Our first step is very similar to the one we created a fungible asset but with only one difference;
-  ```js
-  const {
-    mint: popMint,
-    brand: popBrand,
-    issuer: popIssuer,
-   } = makeIssuerKit('POP', AssetKind.COPY_SET);
-  ```
-  The argument `AssetKind.COPY_SET` is specified when we want to create non-fungible tokens. The argument for fungible
-tokens are `AssetKind.NAT` but we did not specify that because it's the default option. See the docs page for 
-[other possible AssetKind options](https://docs.agoric.com/reference/ertp-api/ertp-data-types.html#assetkind). Once we have out issuerKit 
-we can move on to the next step which is creating the amount to be minted;
-  ```js
-  const popAmount = AmountMath.make(popBrand, harden([{
-        organization: 'Chainboard Academy',
-        courseName: 'Agoric Bootcamp',
-        studentId: '12',
-      }]));
-  ```
-  The data of an NFT is wrapped around an array. This is particularly useful when we want to add/subtract non-fungible
-amounts. Now we can move on to the minting phase;
-  ```js
-  const popPayment = popMint.mintPayment(popAmount);  
-  ```
-  We can store NFTs just like we store fungible tokens;
-  ```js
-  const popPurse = popIssuer.makeEmptyPurse();
-  popPurse.deposit(popPayment);
-  ```
+##### ERTP ile nasıl non-fungible tokenlar oluşturulur?
+İlk adımımız, oluşturduğumuz bir fungible varlık ile çok benzer fakat tek bir farkla;
+```js
+const {
+  mint: popMint,
+  brand: popBrand,
+  issuer: popIssuer,
+ } = makeIssuerKit('POP', AssetKind.COPY_SET);
+```
+`AssetKind.COPY_SET` argümanı, non-fungible tokenlar oluşturmak istediğimizde belirtilir. Fungible tokenlar için argüman `AssetKind.NAT`tir ancak bunu belirtmedik çünkü varsayılan seçenektir. Diğer olası AssetKind seçenekleri için belgelere bakabilirsiniz [buradan](https://docs.agoric.com/reference/ertp-api/ertp-data-types.html#assetkind). EmitterKit'imiz olduğunda bir sonraki adıma geçebiliriz, bu da basılacak miktarı oluşturmaktır;
+```js
+const popAmount = AmountMath.make(popBrand, harden([{
+      organization: 'Chainboard Academy',
+      courseName: 'Agoric Bootcamp',
+      studentId: '12',
+    }]));
+```
+Bir NFT'nin verisi bir dizi etrafına sarılır. Bu, non-fungible miktarları eklemek/çıkarmak istediğimizde özellikle yararlıdır. Artık basma aşamasına geçebiliriz;
+```js
+const popPayment = popMint.mintPayment(popAmount);  
+```
+NFT'leri, fungible tokenları depoladığımız gibi depolayabiliriz;
+```js
+const popPurse = popIssuer.makeEmptyPurse();
+popPurse.deposit(popPayment);
+```
 
 ## Zoe
 ### Context
-"*...Contracts enable the exchange of rights across these protected domains.*"[2]
+"*...Sözleşmeler, bu korunan alanlar arasında hakların değişimini sağlar.*"[2]
 
 <img src="./images/contractHost.png" width='60%'> 
 
 *Figure 4: Sample Exchange Diagram[3]*
 
-Once we obtain `tradeable electronic rights`, we need a secure layer to enable trading of those rights.
-That is exactly what a contract does as the quote above states. But this raises another problem. How are we going to
-secure the contract from malicious users? In the diagram above Alice and Bob agree on[2];
-* The issuers of each of the rights at stake.
-* The source code of the contract.
-* Who is to play which side of the contract.
-* A third party they mutually trust to run their agreed code, *whatever* it is, honestly
+Bir kez `takas edilebilir elektronik haklar` elde ettiğimizde, bu hakların ticaretini sağlamak için güvenli bir katmana ihtiyaç duyarız.
+İşte tam olarak bir sözleşmenin yaptığı şey yukarıdaki alıntıya göre. Ancak bu başka bir sorunu gündeme getirir. Sözleşmeyi kötü niyetli kullanıcılardan nasıl koruyacağız? Yukarıdaki diyagramda Alice ve Bob[2] üzerinde anlaştılar;
+* Her iki hakın da ihraççıları.
+* Sözleşmenin kaynak kodu.
+* Sözleşmenin hangi tarafını oynayacağı.
+* Ne olursa olsun, onların kabul ettiği kodu dürüstçe çalıştıracakları bir üçüncü taraf.
 
-This third party Alice and Bob mutually trust to run their code is **Contract Host**. `Zoe` is designed by Agoric
-to serve as the contract host in Agoric ecosystem. It is the layer where all the smart contracts are installed
-and run.
+Bu üçüncü taraf, Alice ve Bob'ın kodlarını çalıştırmaları için karşılıklı olarak güvendikleri kişi **Sözleşme Ev Sahibi**dır. `Zoe`, Agoric tarafından Agoric ekosisteminde sözleşme ev sahibi olarak hizmet etmek üzere tasarlanmıştır. Bu, tüm akıllı sözleşmelerin kurulduğu ve çalıştığı katmandır.
 
-`Zoe` plays a key role in establishing trust between users and developers. How? In some other big networks like 
-Ethereum, a smart contract developer has the full access to users assets inside the contract code. This enables 
-some malicious developers to perform some bad actions. But in an `ocaps` system this should never happen. The
-motto in a `ocaps` system is: *Do not bring security, remove insecurity.* `Zoe` brings this mindset to smart contract
-development. The way `Zoe` does that is through `escrowing`. A smart contract is where mutually suspicious parties
-trade rights. `Zoe` locks/escrows the rights of all parties until one of the conditions is met in the contract. A
-developer has no direct access to rights but instead they implement the required logic by using `Amount`s. Remember `Amount`s 
-from ERTP section? This is how `ERTP` and `Zoe` works together to establish secure trading of `erights`.
+`Zoe`, kullanıcılar ve geliştiriciler arasında güven oluşturur. Nasıl? Diğer büyük ağlarda (örneğin Ethereum'da) bir akıllı sözleşme geliştiricisi, sözleşme kodu içindeki kullanıcı varlıklarına tam erişime sahiptir. Bu, bazı kötü niyetli geliştiricilerin bazı kötü eylemler gerçekleştirmesine olanak sağlar. Ancak bir `ocaps` sisteminde bu asla olmamalıdır. `Ocaps` sistemindeki slogan: *Güvenlik getirme, güvensizliği kaldır.* `Zoe`, bu zihniyeti akıllı sözleşme geliştirme sürecine getirir. `Zoe` bunu `escrowing` yoluyla yapar. Bir akıllı sözleşme, karşılıklı şüpheli tarafların haklarını ticarete çeviren yerdir. `Zoe`, sözleşmedeki tüm tarafların haklarını, sözleşmede belirli bir koşul yerine gelene kadar kilitler/escrows. Bir geliştiricinin haklara doğrudan erişimi yoktur, bunun yerine gerekli mantığı `Amount`ları kullanarak uygularlar. `ERTP` bölümünden `Amount`ları hatırlıyor musunuz? İşte `ERTP` ve `Zoe` nasıl çalışır ve `erights`ın güvenli ticaretini nasıl sağlar.
 
-### Structure Of A Zoe Contract
-`Zoe` acts as the *Contract Host* to secure users from malicious developers but it is also a rich framework for smart contract
-developers to show their skills and creativity.
+### Bir Zoe Sözleşmesinin Yapısı
+`Zoe`, kullanıcıları kötü niyetli geliştiricilerden koruyan *Sözleşme Ev Sahibi* olarak hareket eder, ancak aynı zamanda akıllı sözleşme geliştiricileri için yeteneklerini ve yaratıcılıklarını gösterebilecekleri zengin bir çerçevedir.
 
-In Agoric smart contracts are deployed and accessed through `Zoe`. But, does `Zoe` accept every code installed as a smart contract?
-Of course not, the smart contracts must have the following structure;
+Agoric'teki akıllı sözleşmeler `Zoe` aracılığıyla dağıtılır ve erişilir. Ama, `Zoe` her yüklenen kodu akıllı sözleşme olarak kabul eder mi? Elbette hayır, akıllı sözleşmelerin aşağıdaki yapısı olmalıdır;
 
 <details>
   <summary> 
-    Sample Contract
+    Örnek Sözleşme
   </summary>
 
 ```js
 // @ts-check
-// Checks the types as defined in JSDoc comments
+// JSDoc yorumlarında tanımlanan türleri kontrol eder
 
-// Add imports here
+// İçe aktarmalarınızı buraya ekleyin
 
-// Optional: you may wish to use the Zoe helpers in
+// Opsiyonel: Zoe yardımcılarını kullanmayı tercih edebilirsiniz
 // @agoric/zoe/src/contractSupport/index.js
 import { swap as _ } from '@agoric/zoe/src/contractSupport/index.js';
 
-// Import the Zoe types
+// Zoe türlerini içe aktar
 import '@agoric/zoe/exported.js';
 
 /**
-* [Contract Description Here]
+* [Sözleşme Açıklaması Buraya]
 *
 * @type {ContractStartFn}
   */
 const start = (zcf, _privateArgs) => {
-// ZCF: the Zoe Contract Facet
+// ZCF: Zoe Contract Facet
 
-// privateArgs: any arguments to be made available to the contract
-// code by the contract owner that should not be in the public
-// terms.
+// privateArgs: sözleşme sahibi tarafından sözleşme 
+// koduna kamuflajlı terimlerde bulunmaması gereken sözleşmeye 
+// açık olması gereken herhangi bir argüman.
 
-// Add contract logic here, including the
-// handling of offers and the making of invitations.
+// Tekliflerin işlenmesi ve davetiyelerin oluşturulması dahil 
+// olmak üzere sözleşme mantığınızı buraya ekleyin.
 
-// Example: This is an example of an offerHandler
-// which just gives a refund payout automatically.
+// Örnek: Bu, otomatik olarak bir iade ödemesi veren bir 
+// teklif işleyicisinin bir örneğidir.
 const myOfferHandler = zcfSeat => {
 zcfSeat.exit();
-const offerResult = 'success';
+const offerResult = 'başarı';
 return offerResult;
 };
 
-// Example: This is an invitation that, if used to make
-// an offer will trigger `myOfferHandler`, giving a
-// refund automatically.
+// Örnek: Bu, bir teklif yapmak için kullanılırsa, 
+// `myOfferHandler`ı tetikleyen ve otomatik olarak bir 
+// geri ödeme sağlayan bir davetiyedir.
 const invitation = zcf.makeInvitation(myOfferHandler, 'myInvitation');
 
-// Optional: Methods added to this object are available
-// to the creator of the instance.
+// Opsiyonel: Bu nesneye eklenen metodlar, örneğin 
+// oluşturucuya kullanılabilir.
 const creatorFacet = {};
 
-// Optional: Methods added to this object are available
-// to anyone who knows about the contract instance.
-// Price queries and other information requests can go here.
+// Opsiyonel: Bu nesneye eklenen metodlar, sözleşme 
+// örneğini bilen herkese kullanılabilir.
+// Fiyat sorguları ve diğer bilgi talepleri burada olabilir.
 const publicFacet = {};
 
 return harden({
-   creatorInvitation: invitation, // optional
-   creatorFacet, // optional
-   publicFacet, // optional
+   creatorInvitation: invitation, // opsiyonel
+   creatorFacet, // opsiyonel
+   publicFacet, // opsiyonel
   });
 };
 
@@ -286,35 +209,31 @@ export { start };
 ```
 </details>
 
-Above is a sample `Zoe` contract in it's the simplest form. However, it still contains all structural parts of a `Zoe` 
-contract. Let's breakdown these components one bye one;
-1. Every `Zoe` contract must export a method called `start`. It's usually the last line of the contract.
+Yukarıda, en basit haliyle bir `Zoe` sözleşmesi örneği bulunmaktadır. Ancak, hala bir `Zoe` sözleşmesinin tüm yapısal parçalarını içermektedir. Bu bileşenleri bir bir inceleyelim;
+1. Her `Zoe` sözleşmesi, genellikle sözleşmenin son satırı olan `start` adında bir metot dışa aktarmalıdır.
    ```js
    export { start }; 
    ```
-2. The `start` method should accept a `zcf` object as its first argument. `zcf` stands for `Zoe Contract Facet` which is an API the smart contract developers to 
-interact with `Zoe`.
-3. Use arrow function definitions instead of `function` keyword;
+2. `start` metodu ilk argüman olarak bir `zcf` nesnesini kabul etmelidir. `zcf` `Zoe Contract Facet` anlamına gelir ve bu, akıllı sözleşme geliştiricilerin `Zoe` ile etkileşime geçmesini sağlar.
+3. `function` anahtar kelimesi yerine ok işlevi tanımlamalarını kullanın;
    ```js
-   // Do
+   // Yap
    const start = (zcf) => {
-    // Method body
+    // Metot gövdesi
    }
   
-   // Do not do
+   // Yapma
    function start(zcf) {
-    // Method body
+    // Metot gövdesi
    }
    ```
-4. By convention, most `Zoe` contracts return two APIs: `creatorFacet` and `publicFacet`;
-   * **creatorFacet**: The word `creator` means the user who deployed this contract. Therefore, only this API should contain methods that have administrative powers.
-     `creatorFacet` is only available during the deployment of the contract. So the creator should hold on to this reference. Because once it's gone, it's gone.
-   * **publicFacet**: This is the API contract exposes to the whole world. `publicFacet` is accessible via the `Zoe` interface.
+4. Geleneksel olarak, çoğu `Zoe` sözleşmesi iki API döndürür: `creatorFacet` ve `publicFacet`;
+   * **creatorFacet**: `creator` kelimesi, bu sözleşmeyi dağıtan kullanıcıyı ifade eder. Bu nedenle, yalnızca bu API'nin yönetim yetkisine sahip metotları içermesi gerekir.
+     `creatorFacet` yalnızca sözleşmenin dağıtılması sırasında kullanılabilir. Bu yüzden yaratıcı bu referansı elinde tutmalıdır. Çünkü bir kere gitti mi, gitti.
+   * **publicFacet**: Bu, sözleşmenin tüm dünyaya açtığı API'dir. `publicFacet`, `Zoe` arayüzü üzerinden erişilebilir.
 
-### Offers
-The parties agreed to trade rights over a trusted contract host use `Offer`s to enter the contract. An `Offer` has a special structure that enables `Zoe` to 
-secure every user's rights. This security model is also called `Offer Safety` but we'll get to that in a bit. For now, let's focus on `Offer`s. Below is a 
-sample `Zoe Offer`:
+### Teklifler
+Tarafların güvendiği bir sözleşme ev sahibi üzerinden hakları ticaret yapmayı kabul etmeleri durumunda, sözleşmeye girmek için `Teklif` kullanılır. Bir `Teklif`in özel bir yapısı vardır ki bu, `Zoe`nun her kullanıcının haklarını güvence altına almasını sağlar. Bu güvenlik modeline ayrıca `Teklif Güvenliği` de denir ama birazdan ona geleceğiz. Şimdilik `Teklif`lere odaklanalım. Aşağıda bir `Zoe Teklifi` örneği bulunmaktadır:
 ```js
 const userSeat = await E(zoe).offer(
   invitation,
@@ -323,39 +242,40 @@ const userSeat = await E(zoe).offer(
 );
 ```
 
-Let's breakdown the `offer()` method's arguments first:
-* **invitation**: `Zoe` expects a reference from users to point the method they want to use to interact with the contract. 
-This kind of reference is called an `invitation`. The `zcf.makeInvitation()` is a special `Zoe` method used for creating invitations.
-* **proposal**: Proposal is a js record that has three important properties: `give`, `want` and `exit`. Let's review a sample proposal;
+Öncelikle `offer()` metodunun argümanlarını inceleyelim:
+* **invitation**: `Zoe`, kullanıcılardan sözleşmeyle etkileşim kurmak için kullanmak istedikleri metoda işaret eden bir referans bekler. 
+Bu tür bir referansa `davetiye` denir. `zcf.makeInvitation()` özel bir `Zoe` metodudur ve davetiyeleri oluşturmak için kullanılır.
+* **proposal**: Proposal, `give`, `want` ve `exit` olmak üzere üç önemli özelliğe sahip bir js kaydıdır. Bir örnek proposal'a göz atalım;
   ```js
   const myProposal = harden({
     give: { Asset: AmountMath.make(quatloosBrand, 4n) },
     want: { Price: AmountMath.make(moolaBrand, 15n) },
-    exit: { afterDeadline: {
+    exit: { afterDeadline
+
+: {
       timer,
       deadline: 100n,
     }}
   });
   ```
-  * `give`: User specify what they are willing to pay as an amount, not actual money.
-  * `want`: User specify what they want in return, again as an amount not actual money. 
-  * `exit`: The duration of time before this offer expires.
+  * `give`: Kullanıcılar, gerçek para olmamakla birlikte, ödemeye istekli oldukları tutarı belirtir.
+  * `want`: Kullanıcılar, yine gerçek para olmamakla birlikte, karşılığında ne istediklerini belirtir. 
+  * `exit`: Bu teklifin süresinin dolmasına kadar geçecek süre.
  
-  `Asset` and `Price` are keywords used to identify the rights in a meaningful way.  
-  * **payments**: Payment is js record that `Zoe` uses to escrow the actual assets. It has the following structre;
+  `Asset` ve `Price`, hakları anlamlı bir şekilde tanımlamak için kullanılan anahtar kelimelerdir.  
+  * **payments**: Payment, `Zoe`nun gerçek varlıkları emanete almak için kullandığı js kaydıdır. Aşağıdaki yapıya sahiptir;
     ```js
     const paymentKeywordRecord = {
         'Asset' : quatloosPayment,
     };  
     ```
-    Notice that the keyword `Asset` matches the one in the `give` property of the proposal. The `quatloosPayment` is an ERTP `Payment` object that 
-  contains an amount of quatloos less than or equal to the one in the `give` property of the proposal record.
+    `Asset` anahtar kelimesinin, teklifin `give` özelliğindekiyle eşleştiğini fark edin. `quatloosPayment`, teklif kaydının `give` özelliğindeki birine eşit veya daha az quatloos miktarı içeren bir ERTP `Payment` nesnesidir.
 
-    > **Important**: If there's an amount specified in the `give` section, there must be a corresponding record involving the payment for that amount in the `give`
-    > section.
+    > **Önemli**: `give` bölümünde belirtilen bir miktar varsa, bu miktar için `give`
+    > bölümünde karşılık gelen bir ödeme kaydı olmalıdır.
  
-#### What Happens After An Offer Is Executed?
-Since a trade is a both-way transaction, users will probably want something in return of what they paid.
+#### Bir Teklif Gerçekleştirildikten Sonra Neler Olur?
+Bir takas, her iki yönlü bir işlem olduğundan, kullanıcılar muhtemelen ödediklerinin karşılığında bir şeyler almak isteyecektir.
 ```js
 const userSeat = await E(zoe).offer(
   invitation,
@@ -364,57 +284,51 @@ const userSeat = await E(zoe).offer(
 );
 ```
 
-A `userSeat` is returned from the `offer()` method. To make sure an offer is executed correctly, one must invoke `getOfferResult` method.
+`offer()` metodu bir `userSeat` döndürür. Bir teklifin doğru bir şekilde gerçekleştirildiğinden emin olmak için, `getOfferResult` metodunu çağırmak gereklidir.
 ```js
 const offerResult = await E(userSeat).getOfferResult()
 ```
 
-The `offerResult` is whatever the contract returns, do not have specific structure. We call this to make sure is there's an error thrown while executing the contract
-code.
+`offerResult`, sözleşmenin döndürdüğü herhangi bir şeydir ve belirli bir yapısı yoktur. Sözleşme kodunun çalıştırılması sırasında bir hata olup olmadığını kontrol etmek için bunu çağırırız.
 
-Once we're sure the code executed without any error, we can withdraw our assets;
+Kodun herhangi bir hata olmadan çalıştığından emin olduğumuzda, varlıklarımızı çekebiliriz;
 ```js
 const moolaPayment = await E(userSeat).getPayout('Price');
 ```
 
-This is how we withdraw our `rights` from a contract using `Zoe` and `Offers`. 
+İşte `Zoe` ve `Teklifler` kullanarak bir sözleşmeden `haklarımızı` nasıl çekeriz. 
 
-### Two Sides Of Zoe
-Notice that in *Figure 4*, there are two chairs inside the `Contract Host`. The terminology `Zoe` uses is like this: Every transaction is some kind of `Offer`
-and all participants wishing to trade rights each have a `seat` at the table. So this should explain why a `userSeat` is returned from an offer. 
+### Zoe'nun İki Yüzü
+*Figure 4*'te, `Sözleşme Ev Sahibi`nin içinde iki sandalye olduğunu fark edin. `Zoe`nun terminolojisi şöyledir: Her işlem bir tür `Teklif`dir ve tüm katılımcılar, haklarını ticarete açmak için bir `sandalye`ye sahiptirler. Bu nedenle, bir tekliften bir `userSeat` döndüğünü açıklar. 
 
-#### But wait, what are those two sides then?
-We can think of `Zoe` framework as the sum of two distinct components;
-* `Zoe Contract Facet(ZCF)`: An API only exposed to the contract developers. Client applications have no way of interacting with this API.
-* `Zoe Service`: This API is exposed to the whole world. Whether it's a client application or a user playing around with REPL, they all can access to this API.
+#### Ama bekleyin, bu iki yüz ne?
+`Zoe` çerçevesini, iki ayrı bileşenin toplamı olarak düşünebiliriz;
+* `Zoe Contract Facet(ZCF)`: Yalnızca sözleşme geliştiricilere açık olan bir API. İstemci uygulamaların bu API ile etkileşim kurma yolları yoktur.
+* `Zoe Service`: Bu API, tüm dünyaya açıktır. İster bir istemci uygulama, ister REPL ile oynayan bir kullanıcı olsun, hepsi bu API'ye erişebilir.
 
-#### Which API does a `seat` belong?
-Whenever you try to understand which API (`ZCF` or `Zoe Service`) an object is a part of, ask yourself this question: Is this object synchronously 
-accessible from within the contract? If yes, look for that object in [ZCF Docs](https://docs.agoric.com/reference/zoe-api/zoe-contract-facet.html). 
-Otherwise, search for it in the [Zoe Service Docs](https://docs.agoric.com/reference/zoe-api/zoe.html).  
+#### Bir `seat` hangi API'ye aittir?
+Bir nesnenin hangi API'ye (`ZCF` veya `Zoe Service`) ait olduğunu anlamaya çalıştığınızda, kendinize şu soruyu sorun: Bu nesne, sözleşme içinden senkron bir şekilde erişilebilir mi? Eğer evetse, bu nesneyi [ZCF Dokümanları](https://docs.agoric.com/reference/zoe-api/zoe-contract-facet.html) içinde arayın. Aksi takdirde, [Zoe Service Dokümanları](https://docs.agoric.com/reference/zoe-api/zoe.html) içinde arayın.  
 
-Let's apply the above hint to `userSeat`,
-* `userSeat` is returned from an offer
-* We get the `offerResult` from this `userSeat`
-  * `offerResult` is what the contract returns after executing its code
-* We withdraw our `erights` from this `userSeat`
-* Contract code does not have a synchronous access to this object
+Yukarıdaki ipucunu `userSeat`'e uygulayalım,
+* `userSeat`, bir tekliften döndürülür
+* Bu `userSeat`'den `offerResult`'u alırız
+  * `offerResult`, sözleşme kodunu çalıştırdıktan sonra döndürdüğü şeydir
+* `haklarımızı` bu `userSeat`'den çekeriz
+* Sözleşme kodu, bu nesneye senkron bir erişime sahip değildir
 
-Conclusion: `userSeat` is part of the `Zoe Service` API.
+Sonuç: `userSeat`, `Zoe Service` API'nin bir parçasıdır.
 
-#### How does a contract pass rights to a `userSeat`? Enter `zcfSeat`!
-`zcfSeat` is what is handed to the contract per offer execution. It contains the user's payments in a escrowed state(contract developer cannot access) and the proposal
-itself so that the contract developers can enforce required logic. Once the assets are reallocated between `zcfSeat`s inside a contract, they can be withdrawn from
-the `userSeat`.
+#### Bir sözleşme, `userSeat`'e nasıl hak geçer? İşte burada `zcfSeat` devreye girer!
+Her teklifin gerçekleştirilmesi sırasında sözleşmeye verilen `zcfSeat`dir. Kullanıcının ödemelerini bir emanet halinde (sözleşme geliştiricisi erişemez) ve öneriyi içerir, böylece sözleşme geliştiricileri gerekli mantığı zorlayabilir. Varlıklar sözleşme içindeki `zcfSeat`'ler arasında yeniden dağıtıldıktan sonra, `userSeat`'ten çekilebilirler.
 
-### Contract Development Experience
-#### How do you feel about TDD?
-Smart Contract Development is a field that it's almost a `must` to do TDD since test environments are too costly in terms of developer feedback time.
+### Sözleşme Geliştirme Deneyimi
+#### TDD hakkında ne düşünüyorsunuz?
+Akıllı Sözleşme Geliştirme, test ortamlarının geliştirici geri bildirim süresi açısından çok maliyetli olduğu bir alandır ve neredeyse TDD yapmak bir `zorunluluk`dur.
 
-#### Enter `Ava`
-Agoric uses `ava` as their unit testing framework. It's useful to [check out it's docs](https://github.com/avajs/ava) before starting the development.
+#### İşte burada `Ava` devreye girer
+Agoric, birim test çerçevesi olarak `ava` kullanır. Geliştirmeye başlamadan önce [dokümantasyonunu kontrol etmek](https://github.com/avajs/ava) yararlı olabilir.
 
-Let's see some code!
+Hadi biraz kod görelim!
 
 ## Resources
 [1] [Capability Based Financial Instruments](https://papers.agoric.com/assets/pdf/papers/capability-based-financial-instruments.pdf)<br>
