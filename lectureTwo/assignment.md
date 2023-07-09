@@ -1,20 +1,20 @@
-# Lecture Two - Assignment
+# İkinci Ders - Ödev
 
-## Assignment Description:
+## Ödev Açıklaması:
 
-1. Do `agoric init assignment-two`. Go to the project directory, install dependencies.
-2. Add `createNewToken` function to the contract.js file;
-2. Add `createNewToken` to the creatorFacet;
-3. Add the following tests to test-contract.js:
-    - create new token;
-    - compare both tokens issuers;
-    - compare amounts of both tokens;
+1. `agoric init assignment-two` yapın. Projeye gidin, bağımlılıkları yükleyin.
+2. contract.js dosyasına `createNewToken` fonksiyonunu ekleyin;
+3. `createNewToken`'ı creatorFacet'e ekleyin;
+4. test-contract.js'ye aşağıdaki testleri ekleyin:
+    - yeni token oluştur;
+    - her iki tokenin ihraççısını karşılaştır;
+    - her iki tokenin miktarını karşılaştır;
 
-## Sequence diagram
+## Sıralı diyagram
 
 ```mermaid
 sequenceDiagram
     CLI->>+Contract: createNewToken( seat, offerArgs)
     Contract->>+Contract: mint tokens
-    Contract -->>CLI: Token Issuer
+    Contract -->>CLI: Token Ihraççısı
 ```
