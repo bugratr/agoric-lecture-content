@@ -1,27 +1,27 @@
-# Lecture Four - Assignment
+# Ders Dört - Ödev
 
-## Assignment Description:
+## Ödev Açıklaması:
 
-1. Create a new contract;
-2. Mint some NFTs;
-3. Create a function that allows the user to sell some of the minted NFTs to through the zoe sellItems contract;
-4. Create a new test file for the contract above;
+1. Yeni bir sözleşme oluşturun;
+2. Bazı NFT'ler basın;
+3. Kullanıcının bazı basılmış NFT'leri Zoe sellItems sözleşmesi aracılığıyla satmasına izin veren bir fonksiyon oluşturun;
+4. Yukarıdaki sözleşme için yeni bir test dosyası oluşturun;
 
-## Sequence diagram
+## Sıralı diyagram
 
 ```mermaid
 sequenceDiagram
     actor Alice
     participant Contract
     participant SellItems
-    note over Alice,SellItems: Sell NFT
+    note over Alice,SellItems: NFT Sat
     Alice->>+Contract: sell( nftIDs, pricePerNFT, sellItemsInstalation)
-    Contract->>+Contract: mint NFTs
-    Contract->>+Contract: start SellItems instance
+    Contract->>+Contract: NFT'ler bas
+    Contract->>+Contract: SellItems örneğini başlat
     Contract->>+SellItems: offer(invitation, proposal, ...)
     SellItems -->>Contract: sellItemsCreatorSeat
     Contract -->>Alice: creatorFacet, publicFacet, ...
-    note over Alice,SellItems: Buy NFT
+    note over Alice,SellItems: NFT Satın Al
     Alice->>+SellItems: makeBuyerInvitation()
     SellItems -->>Alice: Invitation
     Alice->>+SellItems: offer(invitation, proposal, ...)
