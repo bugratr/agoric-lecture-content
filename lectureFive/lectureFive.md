@@ -1,99 +1,90 @@
-# Lecture Five - REPL and Deploy Scripts
-## Table of Contents
-* `home` object: REPL or Deploy Scripts?
+# Ders Beş - REPL ve Dağıtım Scriptleri
+## İçindekiler
+* `home` nesnesi: REPL mi Dağıtım Scriptleri mi?
   * REPL
-  * Deploy Script
-* `home` Object for Dapp Developers
-  * Holding on to your objects: `Board` vs `Scratch`?
+  * Dağıtım Scripti
+* Dapp Geliştiricileri için `home` Nesnesi
+  * Nesnelerinizi elde tutmak: `Board` mu `Scratch` mı?
   * NameHub: `agoricNames`, `namesByAddress`
   * `zoe`!
-  * Sending offers in a non-test environment: `wallet` and `walletBridge`
-  * Timers: `localTimerService` vs `chainTimerService`?
-* Demos
-  * Deploy Script as a CLI Client
-  * Send Payments to Another User
+  * Test olmayan bir ortamda teklifler göndermek: `wallet` ve `walletBridge`
+  * Zamanlayıcılar: `localTimerService` mı `chainTimerService` mi?
+* Demolar
+  * CLI İstemcisi olarak Dağıtım Scripti
+  * Başka Bir Kullanıcıya Ödemeler Gönderme
 
-## `home` object: REPL or Deploy Scripts?
+## `home` nesnesi: REPL mi Dağıtım Scriptleri mi?
 
-Blockchain networks are useless without their users. There has to be an agent that represents the user
-in the context of programs. In Agoric, that agent is called `ag-solo`. Each `ag-solo` has its own `vat`. This
-is how it can interact with components that live in other `vats`. When we think about blockchain ecosystem in
-general, the agent representing users in the network is called `wallet`. Agoric has its own implementation wallet too.
-And yes, that wallet is deployed inside the `ag-solo`.
+Kullanıcıları olmayan blockchain ağları işe yaramaz. Kullanıcıyı programlar bağlamında temsil eden bir ajan olmalı. Agoric'te bu ajana `ag-solo` denir. Her `ag-solo`'nun kendi `vat`'i vardır. Bu, diğer `vat`'lerde yaşayan bileşenlerle etkileşime girebilmesinin yolu budur. Genel olarak blockchain ekosistemini düşündüğümüzde, ağdaki kullanıcıları temsil eden ajan `wallet` olarak adlandırılır. Agoric'in kendi cüzdan uygulaması da vardır. Ve evet, bu cüzdan `ag-solo` içinde konuşlandırılmıştır.
 
 <img src='images/lectureFive-One.png' width='60%'>
 
-_Figure 1: Shows possible configurations of the agents_
+_Şekil 1: Ajanların olası yapılandırmalarını gösterir_
 
-In the diagram above, users are represented in their own `ag-solos`:
+Yukarıdaki diyagramda, kullanıcılar kendi `ag-solo`'larında temsil edilir:
 * Ag-solo (Alice)
 * Ag-solo (Bob)
 * Ag-solo (Sam)
 
-And these users interact with a blockchain, the possible configurations for an Agoric Blockchain is:
+Ve bu kullanıcılar bir blockchain ile etkileşime girer, Agoric Blockchain için olası yapılandırmalar şunlardır:
 * Sim-Chain
-* Local One Node Chain
-* Remote Chain: Mainnet or Testnet
+* Yerel Tek Düğüm Zinciri
+* Uzaktan Zincir: Ana ağ veya Test ağı
 
-Considering the time I spent on Agoric, the best development experience for a dapp developer is `Local One Node Chain`
-because you get to run your code in an actual node and not get blocked by network related problems.
+Agoric'te geçirdiğim zamanı dikkate alırsak, bir dapp geliştirici için en iyi geliştirme deneyimi `Yerel Tek Düğüm Zinciri`dir çünkü kodunuzu gerçek bir düğümde çalıştırabilir ve ağla ilgili sorunlarla engellenmezsiniz.
 
-In the following lectures we'll focus on how to spin up `Local One Node Chain`.
+Takip eden derslerde `Yerel Tek Düğüm Zinciri` nasıl başlatılır üzerine odaklanacağız.
 
 
-### What's the `home` object?
-`home` is the root object for tools that let the `ag-solo` interact with the network and other users. This `home`
-object is available from two places:
+### `home` nesnesi nedir?
+`home`, `ag-solo`'nun ağı ve diğer kullanıcılarla etkileşim kurmasına izin veren araçlar için kök nesnedir. Bu `home`
+nesnesi iki yerden erişilebilir:
 1. REPL
-2. Deploy Scripts
+2. Dağıtım Scriptleri
 
 ### REPL
-**R**ead-**E**val-**P**rint-**L**oop - REPL is integrated inside your wallet UI. Recall that since the beginning of 
-the course we've used the below command to access our wallet UI:
+**R**ead-**E**val-**P**rint-**L**oop - REPL, cüzdan UI'nızın içine entegre edilmiştir. Hatırlayın ki kursun başından beri cüzdan UI'mıza erişmek için aşağıdaki komutu kullandık:
 
 ```sh
 agoric open --repl
 ```
 
-The flag `--repl` here indicates that we want the REPL accessible in our wallet UI. Here's a screenshot of the `home`
-object accessed from REPL;
+Buradaki `--repl` bayrağı, REPL'yi cüzdan UI'mızda erişilebilir hale getirmek istediğimizi gösterir. İşte REPL'den erişilen `home`
+nesnesinin bir ekran görüntüsü:
 
 <img src='images/replHome.png' width='60%'>
 
-Some of the objects you see living in `home` objects are internal for `ag-solo`, others are deprecated and some are
-very useful for dapp developers. We'll focus on the last type.
+`home` nesnesinde yaşayan bazı nesneler `ag-solo` için dahilidir, bazıları kullanımdan kaldırılmıştır ve bazıları
+dapp geliştiricileri için çok yararlıdır. Biz son tip üzerine odaklanacağız.
 
-For a full list of which is which please see the [REPL Docs](https://docs.agoric.com/reference/repl/).
+Hangisinin hangisi olduğuna dair tam bir liste için lütfen [REPL Docs](https://docs.agoric.com/reference/repl/) bakınız.
 
-### Deploy Scripts
-In Blockchain ecosystem, the term `deploy script` indicates a script that developers use to deploy their smart-contracts
-to the blockchain network they're building on. In Agoric, this is only one feature of a deploy script. 
+### Dağıtım Scriptleri
+Blockchain ekosisteminde, `dağıtım scripti` terimi, geliştiricilerin akıllı sözleşmelerini üzerinde inşa ettikleri blockchain ağına dağıtmak için kullandığı bir scripti belirtir. Agoric'te bu, bir dağıtım scriptinin yalnızca bir özelliğidir. 
 
-**_Deploy scripts have full access to the `home` object._**
+**_Dağıtım scriptlerinin `home` nesnesine tam erişimi vardır._**
 
-Recall that `home` object has a number of useful tools for dapp developers. Hence, there's no reason why we cannot
-use deploy scripts for purposes other than deploying smart-contracts. We'll discover what we can do with a deploy script
-in a few live demos later in this lecture. For now, let's focus on:
+Hatırlayın ki `home` nesnesi, dapp geliştiricileri için bir dizi yararlı araç içerir. Dolayısıyla, dağıtım scriptlerini akıllı sözleşmeleri dağıtmak dışında başka amaçlar için kullanmamızın önünde bir engel yok. Bu dersin ilerleyen bölümlerinde bir dağıtım scripti ile ne yapabileceğimizi birkaç canlı demo ile keşfedeceğiz. Şimdilik odaklanalım:
 
-**What makes a `deploy script`?**
+**Bir `dağıtım scripti` ne yapar?**
 
-Agoric CLI has a subcommand called `deploy`. This deploy script accepts any number of scripts as its arguments and 
-executes them in order. For instance;
+Agoric CLI'nın `deploy` adında bir alt komutu vardır. Bu dağıtım scripti, argüman olarak istediği kadar script kabul eder ve 
+onları sırayla çalıştırır. Örneğin;
 
 ```shell
 agoric deploy scriptOne.js scriptTwo.js scriptThree.js
 ```
 
-Above sample command will execute all three scripts in the order of;
+Yukarıdaki örnek komut, tüm scriptleri aşağıdaki sırayla çalıştırır;
 1. scriptOne.js 
 2. scriptTwo.js 
 3. scriptThree.js
 
-Great. But;
+Harika. Ama;
 
-**Can `agoric deploy` execute any JS script?**
+**`agoric deploy` herhangi bir JS scriptini çalıştırabilir mi?**
 
-No, it has to follow the below structure:
+Hayır, aşağıdaki yapıyı takip etmelidir:
 
 ```js
 const scriptOne = async (homeP, others) => {
@@ -104,34 +95,27 @@ const scriptOne = async (homeP, others) => {
 export default scriptOne;
 ```
 
-`agoric deploy` invokes every script with two arguments;
-1. `homeP`: A promise for the `home` object
-2. `others`: Some host related helper objects like `bundleSource` which we're using for bundling our contracts and 
-`pathResolve` which we use to resolve the path to our contracts
+"`agoric deploy` her betiği iki argümanla çağırır;
+1. `homeP`: `home` nesnesi için bir promise
+2. `others`: Bizim kontratlarımızı paketlemek için kullandığımız `bundleSource` gibi ve kontratlarımıza yol çözümlemek için kullandığımız `pathResolve` gibi bazı host ile ilgili yardımcı nesneler.
 
-**!!! Important !!!:** If you wish to execute a script using `agoric deploy`, you must `export default` the method
-you wish to execute. In the example above, the method we wish to execute is `scriptOne`, therefore we add;
+**!!! Önemli !!!:** Eğer `agoric deploy` kullanarak bir betiği çalıştırmak isterseniz, çalıştırmak istediğiniz yöntemi `export default` ile dışa aktarmanız gerekir. Yukarıdaki örnekte, çalıştırmak istediğimiz yöntem `scriptOne` olduğu için, son satıra şunu ekliyoruz;
 
 ```js
 // ...
 export default scriptOne;
 ```
 
-to the last line.
+## Dapp Geliştiriciler için `home` Nesnesi
+Daha önce de belirttiğimiz gibi `home` nesnesi birçok araç içerir. Bunlardan bazıları dahili kullanımlar içindir, bazıları agoric-sdk'nin geliştirme aşamasında olduğu için kullanımdan kaldırılmıştır ve bazıları dapp geliştiriciler için çok yararlıdır. Bu yardımcı araçları nasıl kullanabileceğimizi keşfedelim.
 
-## `home` Object for Dapp Developers
-As we said earlier `home` object contains so many tools. Some of them are for internal uses, some of them are deprecated as the agoric-sdk
-is under development and some of them are very useful for the dapp developers. Let's explore how we can use those helpful tool for 
-dapp developers.
-
-### Holding on to your objects: `Board` vs `Scratch`?
-`Hardened JavaScript` is a `OCaps` enforcing environment. Which means that once you lose the reference to an object, you lose that 
-capability. `home` object offers two options for storing objects;
+### Nesnelerinizi koruma: `Board` vs `Scratch`?
+`Hardened JavaScript` bir `OCaps` zorlama ortamıdır. Bu, bir nesnenin referansını bir kere kaybettiğinizde, bu yeteneği de kaybettiğiniz anlamına gelir. `home` nesnesi nesneleri saklama için iki seçenek sunar;
 
 1. Board
 2. Scratch
 
-Let's think about a possible scenario where we have objects we might want to hold on:
+Bir senaryoyu düşünelim ki nesneleri tutmak istiyoruz:
 
 ```js
 const {
@@ -143,7 +127,8 @@ const {
 );
 ```
 
-And in our imaginary contract let's say the content for `publicFacet` and `creatorFacet`:
+Ve hayali sözleşmemizde `publicFacet` ve `creatorFacet` içeriği diyelim ki şöyle:
+
 ```js
 const publicFacet = Far('Public Facet', {
   hello: () => 'Hello from Public Facet!!!',
@@ -154,15 +139,13 @@ const creatorFacet = Far('Creator Facet', {
 });
 ```
 
-By convention, we expect powerful methods like `dangerous` above to be in the `creatorFacet`. So as the creator of this imaginary contract
-we should hold on to the `creatorFacet`, but in the same time we should let our users interact with our `publicFacet`. Looks like we need
-two separate places to store our objects;
-* One for **Public Objects**
-* One for **Private Objects**
+Genellikle `dangerous` gibi güçlü yöntemlerin `creatorFacet`'te olduğunu bekleriz. Bu yüzden bu hayali kontratın yaratıcısı olarak `creatorFacet`'i korumamız gerekiyor, ama aynı zamanda kullanıcılarımızın `publicFacet` ile etkileşimde bulunmasına izin vermeliyiz. Nesnelerimizi saklayabileceğimiz iki ayrı yere ihtiyacımız var gibi görünüyor;
+* **Public Objects** için bir yer
+* **Private Objects** için bir yer
 
-Agoric offer two storage places for these needs: `Board` is for PUBLIC storage and `Scratch` is for PRIVATE storage.
+Agoric bu ihtiyaçlar için iki depolama yeri sunar: `Board` PUBLIC depolama için ve `Scratch` PRIVATE depolama için.
 
-If we want to make use of `home` object for our imaginary scenario in a sample deploy script, it would look like below:
+`home` nesnesini hayali senaryomuz için bir örnek deploy betiğinde kullanmak istesek, aşağıdaki gibi görünür:
 
 ```js
 const scriptOne = async (homeP, { pathResolve }) => {
@@ -198,7 +181,7 @@ export default ${JSON.stringify(dappConstants, undefined, 2)};
 export default scriptOne;
 ```
 
-When we break the code, below is where we put `creatorFacet` and `publicFacet` into storage:
+Kodu incelerken, aşağıdaki bölümde `creatorFacet` ve `publicFacet`'i depoya koyuyoruz:
 
 ```js
 const [publicFacetBoardId, creatorFacetScratchId] = await Promise.all([
@@ -207,80 +190,80 @@ const [publicFacetBoardId, creatorFacetScratchId] = await Promise.all([
   ]);
 ```
 
-* `E(home.board).getId(publicFacet)` puts the value to the `board` if it doesn't already exist and returns the generated unique id, 
-if the value exists it only returns the id. `publicFacet` is PUBLIC because it's stored in `board`.
-* `E(home.scratch).set('creator_facet_scratch_id', creatorFacet)` takes a key and value pair as arguments, returns the key. `creatorFacet` 
-is PRIVATE because it's stored in `scratch`.
 
-Please see the full docs at;
-* [Board API Reference](https://docs.agoric.com/reference/repl/board.html)
-* [Scratch Reference](https://docs.agoric.com/reference/repl/scratch.html#e-home-scratch-set-id-obj)
+* `E(home.board).getId(publicFacet)` değeri `board`a ekler (eğer zaten mevcut değilse) ve oluşturulan benzersiz id'yi döndürür,
+değer zaten varsa sadece id'yi döndürür. `publicFacet`, `board`da saklandığı için KAMU malıdır.
+* `E(home.scratch).set('creator_facet_scratch_id', creatorFacet)` bir anahtar-değer çiftini argüman olarak alır, anahtarı döndürür. 
+`creatorFacet`, `scratch`da saklandığı için ÖZEL'dir.
 
-After we put our objects to storage, we must keep the keys in a safe place. That is, mostly, writing it to local file. 
-In the script above, the filename is `dappConstant.js`. Anybody who has access to this local file might query those objects from
-REPL because `Deploy Scripts` and `REPL` share the same `home` object. For instance, let's say the board id for the `publicFacet`
-is 'board0371'. The `publicFacet` can be queried from **any** `ag-solo` like this:
+Dokümantasyonu aşağıdaki linklerden inceleyebilirsiniz;
+* [Board API Referansı](https://docs.agoric.com/reference/repl/board.html)
+* [Scratch Referansı](https://docs.agoric.com/reference/repl/scratch.html#e-home-scratch-set-id-obj)
+
+Nesnelerimizi depoya koyduktan sonra, anahtarları güvenli bir yerde saklamalıyız. Çoğunlukla, bu yerel bir dosyaya yazmak anlamına gelir. 
+Yukarıdaki scriptte, dosya adı `dappConstant.js`dir. Bu yerel dosyaya erişimi olan herkes, `Deploy Script`leri ve `REPL`'in aynı `home` 
+nesnesini paylaştığı için bu nesneleri REPL'den sorgulayabilir. Örneğin, `publicFacet` için tahta id'si 'board0371' olsun. `publicFacet`, 
+**herhangi bir** `ag-solo` tarafından aşağıdaki gibi sorgulanabilir:
 
 <img src="images/replBoardQ.png" width='40%'>
 
-Only the `ag-solo` that `agoric deploy` is connected to, can query the `creatorFacet` because `home.scratch` is private:
+Yalnızca `agoric deploy`'a bağlı olan `ag-solo`, `home.scratch`'ın özel olmasından dolayı `creatorFacet`'i sorgulayabilir:
 
 <img src="images/replScratchQ.png" width='40%'>
 
 ### NameHub: `agoricNames`, `namesByAddress`
-`NameHubKit` is a data structure, implemented by Agoric team, where it enables users to store/query objects based on a name hierarchy.  
+`NameHubKit`, kullanıcıların isim hiyerarşisine dayalı olarak nesneleri saklamasına/ sorgulamasına olanak sağlayan, Agoric ekibi 
+tarafından uygulanan bir veri yapısıdır.
 
-A `NameHubKit` has two components;
-* `NameHub` for reading data
-* `NameAdmin` for writing access
+Bir `NameHubKit`'in iki bileşeni vardır;
+* Veri okumak için `NameHub`
+* Yazma erişimi için `NameAdmin`
 
-Do not forget to check out full list methods with their explanations and the source code of `NameHubKit` from `NameHubKit Documentation`
-section below.
+`NameHubKit`'in tam liste metotları, açıklamaları ve kaynak kodunu `NameHubKit Dokümantasyonu` bölümünden incelemeyi unutmayın.
 
-`home` object offers two instances of `NameHub`: `agoricNames` and `namesByAddress`,
+`home` nesnesi, iki `NameHub` örneği sunar: `agoricNames` ve `namesByAddress`,
 
-And one instance of `NameAdmin`: `myAddressNameAdmin` which is the `NameAdmin` for `namesByAddress`.
+Ve bir `NameAdmin` örneği: `myAddressNameAdmin`, `namesByAddress` için `NameAdmin`'dir.
 
 #### `agoricNames`
-Notice that normal users do not have write access to `agoricNames`. Why?
+Normal kullanıcıların `agoricNames`'e yazma erişimi olmadığını fark edin. Neden?
 
-`agoricNames` is a special instance of `NameHub` where access to the core Agoric components can be obtained by the user.
-Since allowing any user to write such an important object might cause some security issues for the whole network, users
-do not get a `NameAdmin` for `agoricNames`.
- 
-**What's inside the `agoricNames`?**
+`agoricNames`, kullanıcının çekirdek Agoric bileşenlerine erişim elde edebileceği bir `NameHub` özel örneğidir.
+Herhangi bir kullanıcının bu kadar önemli bir nesneye yazma izni verilmesi, tüm ağ için bazı güvenlik sorunlarına neden olabilir, 
+bu yüzden kullanıcılar `agoricNames` için bir `NameAdmin` alamaz.
 
-If we want to see the contents of `agoricNames`, we could do this:
+**`agoricNames` içinde neler var?**
+
+`agoricNames`'in içeriğini görmek istersek, bunu yapabiliriz:
 
 <img src="images/replAgoricNames.png" width='60%'>
 
-Notice that a nested array is returned where the first element of the inner array is the `key` and the second element is
-a `nameHub` instance. That means we could do something like this:
+Bir iç içe geçmiş dizi döndürüldüğünü fark edin, iç dizinin ilk elemanı `anahtar` ve ikinci eleman bir `nameHub` örneğidir. 
+Bu, aşağıdaki gibi bir şey yapabileceğimiz anlamına gelir:
 
 <img src="images/replLookupIssuer.png" width='60%'>
 
-And query the returned `nameHub` in the same way that we did query `agoricNames`:
+Ve `agoricNames`'i sorguladığımız aynı şekilde döndürülen `nameHub`'ı sorgulayabiliriz:
 
 <img src="images/replIssuerEntries.png" width='60%'>
 
-`lookup` method also lets you set a path as the arguments, so something like below is possible:
+`lookup` metodu, argümanlar olarak bir yol belirlemenize de izin verir, bu yüzden aşağıdaki gibi bir şey mümkündür:
 
 <img src="images/replLookupBld.png" width='60%'>
 
-It's possible to pass 3 or 4 arguments to `lookup` where the level of nested array is that deep.
+`lookup`'a 3 veya 4 argüman geçirmek mümkündür, burada iç içe geçmiş dizinin seviyesi bu kadar derindir.
 
 #### namesByAddress
-`namesByAddress` is also a `NameHub` instance but not for access to network wide core components but for user's personal
-storage. You can access the `NameAdmin` for your own ag-solo from `myAddressNameAdmin`. Let's go over an example scenario;
+`namesByAddress` de bir `NameHub` örneğidir ancak ağ genelinde çekirdek bileşenlere erişim için değil, kullanıcının kişisel 
+depolaması için. `myAddressNameAdmin`'dan kendi ag-solo'nuz için `NameAdmin`'e erişebilirsiniz. Bir örnek senaryo üzerinden gidelim;
 
-> **Important:** One important thing to note here is that users get to see all other users `NameHubs`, but they can
-> only write to their own. This is possible due to the nested structure of the `NameHubs`.
+> **Önemli:** Burada not edilmesi gereken önemli bir şey, kullanıcıların tüm diğer kullanıcıların `NameHub`larını görebilmeleri ancak 
+> sadece kendi `NameHub`larına yazabilmeleridir. Bu, `NameHub`'ların iç içe geçmiş yapısı sayesinde mümkündür.
 
-Imagine Alice has an important object that she only wants to share with Bob. Since Agoric is an OCaps environment
-this is a very likely scenario. How can she share her reference to this important object with Bob?
+Alice'nin, yalnızca Bob ile paylaşmak istediği önemli bir nesnesi olduğunu hayal edin. Agoric bir OCaps ortamı olduğundan 
+bu çok olası bir senaryodur. Bu önemli nesnenin referansını Bob ile nasıl paylaşabilir?
 
-Let's say there's a smart contract implemented just for this purpose, which is also very likely, with a source code
-like:
+Bu amaç için uygulanmış bir akıllı kontratın olduğunu varsayalım, ki bu da çok olasıdır, kaynak kodu aşağıdaki gibi olsun:
 
 ```js
 const start = () => {
@@ -288,7 +271,17 @@ const start = () => {
 
   const creatorFacet = Far('Important Object Receiver', {
     receiveNew: newImportantObject => {
-      importantObjects.push(newImportantObject);
+      importantObjects.push(newImportantObject
+
+Aşağıdaki kodun Türkçe çevirisi;
+
+```js
+const start = () => {
+  const importantObjects = [];
+
+  const creatorFacet = Far('Önemli Nesne Alıcı', {
+    receiveNew: yeniÖnemliNesne => {
+      importantObjects.push(yeniÖnemliNesne);
     },
     readImportantObjects: () => {
       return [...importantObjects];
@@ -299,11 +292,9 @@ const start = () => {
 };
 ```
 
-> **Note:** [Source code of above contact.](../codeSamples/contract/src/lectureFive/objectReceiver.js) 
-
-In the above contract we only expose `creatorFacet` because we want to make sure that only people who know Bob's 
-address should be able to share objects with Bob. Bob is going to start this contract and put it's `creatorFacet`
-to his `nameHub`. He can do this all-in-one deploy script. A sample deploy script might be like:
+Yukarıdaki kontratta yalnızca `creatorFacet`'i açığa çıkarıyoruz çünkü sadece Bob'un adresini bilen kişilerin Bob ile nesneleri 
+paylaşabilmelerini sağlamak istiyoruz. Bob bu kontratı başlatacak ve `creatorFacet`'i `nameHub`'ına koyacak. Bu işlemi tek seferde 
+bir dağıtım scripti ile yapabilir. Bir dağıtım scripti örneği aşağıdaki gibi olabilir:
 
 ```js
 const shareImportantObject = async (homeP , endowments) => {
@@ -331,111 +322,103 @@ const shareImportantObject = async (homeP , endowments) => {
 
 export default shareImportantObject;
 ```
+**Not:** [Dağıtım betiğinin kaynak kodu.](../codeSamples/api/lectureFive/shareImportantObject.js)
 
-> **Note:** [Source code of the deploy script.](../codeSamples/api/lectureFive/shareImportantObject.js)
+**Dikkat:** `E.get()` bir Promise'den nesne çekmeyi, çözülmesini beklemeksizin sağlar.
 
-> **Caution:** `E.get()` allows fetching objects from a Promise without waiting for it to resolve.
+**Dağıtım betiği ne yapıyor?**
 
-**What's happening in the deploy script?**
+Kaynak koddaki **23. satıra** kadar olan kod, kontratın yüklenmesi ve örneğin başlatılması içindir. 
+[deploy-script-support](https://github.com/Agoric/agoric-sdk/tree/65d3f14c8102993168d2568eed5e6acbcba0c48a/packages/deploy-script-support) başlığını kontrol edin.
 
-The code until **line 23** in the source code is for installing the contract and starting the instance. 
-See [deploy-script-support](https://github.com/Agoric/agoric-sdk/tree/65d3f14c8102993168d2568eed5e6acbcba0c48a/packages/deploy-script-support).
-
-The part we're interested in is:
+İlgilendiğimiz kısım:
 
 ```js
-console.log('Putting objectReceiverCreatorFacet to namesByAddress...');
+console.log('NesneAlıcıYaratıcıFacet isimliAdreslere ekleniyor...');
 await E(myAddressNameAdmin).update('objectReceiver', objectReceiverCreatorFacet);
 ```
 
-Notice;
-* We use [eventual-send](https://github.com/endojs/endo/tree/master/packages/eventual-send)(E) because deploy script
-is not in the same `vat` as the `myAddressAdmin`
-* We use `update` method to initialize a new object
-* We tell Bob what we are doing via a `console.log` 
+Dikkat edin;
+* Dağıtım betiği `myAddressAdmin` ile aynı `vat`'te olmadığı için [eventual-send](https://github.com/endojs/endo/tree/master/packages/eventual-send)(E)'yi kullanıyoruz.
+* Yeni bir nesneyi başlatmak için `update` metodu kullanılır.
+* `console.log` aracılığıyla Bob'a ne yaptığımızı bildiriyoruz.
 
-Once above script is executed, anybody who knows Bob's address can share objects with him. Interacting with the shared
-object from REPL might look like this:
+Yukarıdaki betik çalıştırıldığında, Bob'un adresini bilen herkes onunla nesneleri paylaşabilir. REPL'den paylaşılan nesneyle etkileşim kurmak aşağıdaki gibi görünebilir:
 
-> **Note:** I spinned up a sim-chain so my user's address in `sim-chain-client`.
+> **Not:** Bir simülasyon zinciri başlattım, dolayısıyla kullanıcının adresi `sim-chain-client`'ta.
 
-> **Note:** Since we're on a sim-chain, we act like bot Bob and Alice.
+> **Not:** Simülasyon zincirindeyiz, bu yüzden hem Bob hem de Alice gibi davranıyoruz.
 
-Query the `objectReceiver`;
+`objectReceiver`'ı sorgulayın;
 
 <img src="images/lookupobjectReceiver.png" width='60%'>
 
-Check contents;
+İçerikleri kontrol edin;
 
 <img src="images/firstReadOR.png" width='60%'>
 
-Create `topSecret` and send it to Bob;
+`topSecret` oluşturun ve Bob'a gönderin;
 
 <img src="images/writeOR.png" width='60%'>
 
-Fetch `topSecret` and launch missiles;
+`topSecret`'ı alın ve füzeleri fırlatın;
 
 <img src="images/readAgainOR.png" width='60%'>
 
 
-This is how you can send objects to other users in a private manner. We'll cover how to send payments to other users 
-in the live demo.
+Bu şekilde diğer kullanıcılara özel bir şekilde nesneler gönderebilirsiniz. Canlı demoda diğer kullanıcılara nasıl ödeme gönderileceğini göstereceğiz.
 
-#### NameHubKit Documentation
-* [NameHub API Reference](https://github.com/Agoric/agoric-sdk/blob/65d3f14c8102993168d2568eed5e6acbcba0c48a/packages/vats/src/types.js#L14-L30)
-* [NameAdmin API Reference](https://github.com/Agoric/agoric-sdk/blob/65d3f14c8102993168d2568eed5e6acbcba0c48a/packages/vats/src/types.js#L32-L57)
-* [NameHubKit Source Code](https://github.com/Agoric/agoric-sdk/blob/65d3f14c8102993168d2568eed5e6acbcba0c48a/packages/vats/src/nameHub.js)
+#### NameHubKit Dokümantasyonu
+* [NameHub API Referansı](https://github.com/Agoric/agoric-sdk/blob/65d3f14c8102993168d2568eed5e6acbcba0c48a/packages/vats/src/types.js#L14-L30)
+* [NameAdmin API Referansı](https://github.com/Agoric/agoric-sdk/blob/65d3f14c8102993168d2568eed5e6acbcba0c48a/packages/vats/src/types.js#L32-L57)
+* [NameHubKit Kaynak Kodu](https://github.com/Agoric/agoric-sdk/blob/65d3f14c8102993168d2568eed5e6acbcba0c48a/packages/vats/src/nameHub.js)
 
 ### `zoe`!
-Recall that `zoe` has two sides;
-1. `ZoeService` mostly for client purposes
-2. `ZoeContractFacet` offers a toolset for smart-contract developers
+Hatırlayın ki `zoe`'nin iki yüzü vardır;
+1. `ZoeService` çoğunlukla müşteri amaçları içindir
+2. `ZoeContractFacet` akıllı kontrat geliştiricileri için bir araç seti sunar
 
-When we think inside the context of REPL and Deploy Scripts, it's obvious we're the client side. This means that 
-what `home` object offers us as `zoe` is actually the `ZoeService`. Please feel free to check out whole 
-[ZoeService API Reference](https://docs.agoric.com/reference/zoe-api/zoe.html). All methods in `ZoeService` API are
-working in both REPL and Deploy Scripts. I just want to touch on a few methods that I see commonly used:
+REPL ve Dağıtım Betikleri bağlamında düşündüğümüzde, bizim müşteri tarafında olduğumuz açıktır. Bu, `home` nesnesinin bize `zoe` olarak sunduğu şeyin aslında `ZoeService` olduğu anlamına gelir. Tüm [ZoeService API Referansı](https://docs.agoric.com/reference/zoe-api/zoe.html)'na göz atmakta özgürsünüz. `ZoeService` API'deki tüm metodlar hem REPL hem de Dağıtım Betiklerinde çalışır. Ben sadece sık kullanılan birkaç metoda değinmek istiyorum:
 
 <img src="images/chainboardDiagrams-lecture-five-zoe.png" width='60%'>
 
-_Figure 2: Shows Zoe's commonly used methods from Deploy Scripts and REPL_
+_Figure 2: Zoe'nin Dağıtım Betiklerinde ve REPL'de sıkça kullanılan metodları gösterir_
 
-As `Zoe` is the contract host for the Agoric Network, all contract deployed to this host should do it in the same
-way. There are two main methods:
+`Zoe`, Agoric Ağı için kontrat hostudur ve bu hosta konuşlandırılan tüm kontratlar aynı şekilde yapılmalıdır. İki ana metot vardır:
 
 1. `E(home.zoe).install()`
 2. `E(home.zoe).startInstance()`
 
-Once we've successfully installed and instantiated a contract, there are several actions we can perform with a reference
-to the contract's instance;
 
-1. `E(home.zoe).getBrands(instance)` and `E(home.zoe).getIssuers(instance)` 
+Aşağıdaki kodları ve açıklamalarını satır satır Türkçe'ye çevirelim:
+
+Bir sözleşmeyi başarıyla yüklediğimiz ve örneklendirdiğimizde, sözleşmenin örneğine referansla birkaç işlem yapabiliriz:
+
+1. `E(home.zoe).getBrands(instance)` ve `E(home.zoe).getIssuers(instance)` 
 2. `E(home.zoe).getTerms(instance)`
 3. `E(home.zoe).getPublicFacet(instance)`
 
-Do not forget to see the whole [ZoeService API Reference.](https://docs.agoric.com/reference/zoe-api/zoe.html)
+Tüm [ZoeService API Referansı'nı](https://docs.agoric.com/reference/zoe-api/zoe.html) incelemeyi unutmayın.
 
-### Sending offers in a non-test environment: `wallet` and `walletBridge`
-Offer Safety is one of the most important aspects of Agoric in terms of the value it brings to the table.
-So far we've only seen one way to send offers, that is;
+### Test olmayan bir ortamda teklif gönderme: `wallet` ve `walletBridge`
+Teklif Güvenliği, Agoric'in sunduğu değer açısından en önemli yönlerden biridir.
+Şimdiye kadar teklif göndermenin sadece bir yolunu gördük, o da;
 
 ```js
 const userSeat = await E(zoe).offer(
   invitation,
   proposal,
   payment,
-  offerArgs, // Optional
+  offerArgs, // İsteğe bağlı
 );
 ```
 
-* **invitation:** Holds a reference to the `offerHandler`, required
-* **proposal:** User specifies what they want and what they're willing to pay in return, required if there's going to 
-be a right transfer in the offer
-* **payment:** The actual asset user is paying, required if there's `give` property in the proposal
-* **offerArgs:** Business logic specific data, optional
+* **invitation:** `offerHandler`a bir referans tutar, gerekli
+* **proposal:** Kullanıcı ne istediğini ve karşılığında ne ödemeye hazır olduğunu belirtir, teklifte bir hak transferi olacaksa gerekli
+* **payment:** Kullanıcının gerçekten ödediği varlık, teklifte `give` özelliği varsa gerekli
+* **offerArgs:** İş mantığına özgü veri, isteğe bağlı
 
-Let's imagine a scenario where we want some `Moola` fungible assets in exchange for some amount of `Quatloos` fungible
-assets. We could execute the corresponding offer in a unit test like below:
+Bazı `Moola` fungible varlıklarını, belirli bir miktar `Quatloos` fungible varlık karşılığında almak istediğimiz bir senaryo hayal edelim. Aşağıdaki gibi bir birim testinde ilgili teklifi gerçekleştirebiliriz:
 
 ```js
 const {
@@ -462,32 +445,28 @@ const userSeat = await E(zoe).offer(
 );
 ```
 
-Notice that we minted required payment on the go by invoking `quatloosMint.mintPayment(quatloosAmount)`. Would this be
-possible in a real network environment? No, it's not possible. If it was possible, it would mean that you're able to
-print money. There's no blocking technical reason for this, but it's still a long shot that people would trade an asset
-you can print. Alright then, how can one get their hands on a payment?
+Gereken ödemeyi `quatloosMint.mintPayment(quatloosAmount)` çağırarak oluşturduğumuzu fark edin. Bu, gerçek bir ağ ortamında mümkün olabilir mi? Hayır, mümkün değil. Eğer mümkün olsaydı, bu paranın basıldığı anlamına gelirdi. Bunu engelleyen teknik bir sebep olmasa da, basabileceğiniz bir varlığı insanların alışveriş yapacak olmaları çok uzak bir ihtimal. Peki, ödeme nasıl elde edilir?
 
-**Enter `home.wallet`**
+**İşte burada `home.wallet` devreye girer**
 
-Recall that in the earlier sections we talked about how to turn an electronical right into an eright by implementing
-the ERTP interface. ERTP includes components like;
+Daha önceki bölümlerde elektronik bir hakkı, ERTP arayüzünü uygulayarak bir e-hakkına nasıl dönüştürebileceğimizden bahsetmiştik. ERTP şunları içerir;
 
-* Issuer
-* Mint
-* Purse
+* Emitent (Issuer)
+* Para Basımı (Mint)
+* Cüzdan (Purse)
 
-And the list goes on. See [ERTP API Reference](https://docs.agoric.com/reference/ertp-api/) for full documentation.
-`wallet` objects grants access to some of the most important components of ERTP API from a user standpoint. Especially;
-* **Purse:** Where payments are stored.
-* **Payment:** The actual money.
+Ve liste böyle devam eder. Tam belgelendirme için [ERTP API Referansı'nı](https://docs.agoric.com/reference/ertp-api/) gözden geçirin.
+`wallet` nesneleri, kullanıcı açısından ERTP API'nın en önemli bileşenlerine erişim sağlar. Özellikle;
+* **Purse (Cüzdan):** Ödemelerin saklandığı yer.
+* **Payment (Ödeme):** Gerçek para.
 
-Here are the related methods;
+İlgili metotlar aşağıdaki gibidir;
 * `E(home.wallet).addPayment(payment)`
 * `E(home.wallet).getIssuers()`
 * `E(home.wallet).getIssuer(petname)`
 * `E(home.wallet).getPurses()`
 * `E(home.wallet).getPurse(petname)`
-
+  
 > Note: [Definition of Petname](https://docs.agoric.com/glossary/#petname)
 
 See [Wallet API Reference](https://docs.agoric.com/reference/wallet-api.html#wallet-api-commands) for full list of 
