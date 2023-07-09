@@ -1,183 +1,160 @@
-# Lecture Four - Higher-Order Smart Contracts
+# Dördüncü Ders - Daha Üst Düzey Akıllı Sözleşmeler
 
-## Table of Content
-* Understanding The Methodology of `Higher-Order` in Programming
-* How Agoric Applies This `Higher-Order` Methodology
-    * Derived erights
-    * Invitations
-    * Reusable Smart Contracts
+## İçindekiler
+* Programlamada `Daha Üst Düzey` Metodolojisinin Anlaşılması
+* Agoric'in Bu `Daha Üst Düzey` Metodolojiyi Nasıl Uyguladığı
+    * Türetilmiş erights
+    * Davetiyeler
+    * Yeniden Kullanılabilir Akıllı Sözleşmeler
 
-## Understanding The Methodology of `Higher-Order` in Programming
-The most concrete application of _The Methodology of `Higher-Order` Programming_ is higher order functions(HOF).
-According to the [definition](https://en.wikipedia.org/wiki/Higher-order_function) a higher-order function does at least
-one of the following:
+## Programlamada `Daha Üst Düzey` Metodolojisinin Anlaşılması
+_`Daha Üst Düzey` Programlama Metodolojisi_'nin en somut uygulaması daha üst düzey fonksiyonlardır (HOF).
+[Definition](https://en.wikipedia.org/wiki/Higher-order_function) tanımına göre bir daha üst düzey fonksiyon en azından
+aşağıdakilerden birini yapar:
 
-* takes one or more functions as arguments
-* returns a function as its result
+* Bir veya daha fazla fonksiyonu argüman olarak alır
+* Sonuç olarak bir fonksiyon döndürür
 
-The definition above applies for computation in general, so it covers both computer science and mathematics.
+Yukarıdaki tanım genel hesaplama için geçerlidir, bu nedenle hem bilgisayar bilimlerini hem de matematiği kapsar.
 
-JavaScript supports higher-order functions natively. In fact it has some built in methods that uses higher-order
-functions. Here are a few examples;
+JavaScript daha üst düzey fonksiyonları yerleşik olarak destekler. Aslında daha üst düzey
+fonksiyonları kullanan bazı yerleşik metotlara sahiptir. İşte birkaç örnek;
 
 * Array.prototype.map()
 * Array.prototype.filter()
 * Array.prototype.reduce()
 * ...
 
-And the list goes on. `Array.prototype` has these higher-order methods as there are a lot of operations that programmers
-might do that requires iterating over arrays. Make sure to check [this article](https://medium.com/javascript-scene/higher-order-functions-composing-software-5365cf2cbe99)
-out to understanding the reasoning of these methods with some good examples.
+Ve liste devam eder. `Array.prototype`, programcıların diziler üzerinde yineleme gerektiren birçok işlemi olabileceği için bu daha üst düzey metodlara sahiptir. Bu metodların mantığını iyi örneklerle anlamak için [bu makaleyi](https://medium.com/javascript-scene/higher-order-functions-composing-software-5365cf2cbe99)
+kontrol ettiğinizden emin olun.
 
-## How Agoric Applies This `Higher-Order` Methodology
-Agoric uses a few abstractions on top of the concrete higher-order functions in order to apply this methodology. We'll
-focus on three examples where we can observe higher-order mindset and also how those three examples work together to form
-a robust platform.
+## Agoric'in Bu `Daha Üst Düzey` Metodolojiyi Nasıl Uyguladığı
+Agoric, bu metodolojiyi uygulamak için somut daha üst düzey fonksiyonların üzerinde birkaç soyutlama kullanır. Biz
+daha üst düzey zihniyeti gözlemleyebileceğimiz ve aynı zamanda bu üç örneğin nasıl sağlam bir platform oluşturmak için birlikte çalıştığı üç örneğe odaklanacağız.
 
-* Derived erights
-* Invitations
-* Reusable Smart Contracts
+* Türetilmiş erights
+* Davetiyeler
+* Yeniden Kullanılabilir Akıllı Sözleşmeler
 
-Let's break them down one by one.
+Haydi onları tek tek inceleyelim.
 
-### Derived erights
-Now to understand what a `Derived eright` is and how we can make use of it, we must recall [Lecture Two](../lectureTwo/lectureTwo.md):
 
-"*...Contracts enable the exchange of rights across these protected domains.*"[2]
+### Türetilmiş erights
+`Türetilmiş eright`ın ne olduğunu ve nasıl kullanabileceğimizi anlamak için, [İkinci Dersi](../lectureTwo/lectureTwo.md) hatırlamalıyız:
+
+"*...Sözleşmeler, bu korunan alanlar arasında hakların alışverişini sağlar.*"[2]
 
 <img src="./images/contractHost.png" width='60%'> 
 
-*Figure 4: Sample Exchange Diagram[3] (From lecture two)*
+*Şekil 4: Örnek Takas Diyagramı[3] (İkinci dersten)*
 
-In lecture two we touched on how contracts make it possible to trade rights between mutually suspicious parties. And
-why a `Contract Host` is needed to make this system work. Let's imagine Alice paid Bob to hold on to an asset for some time
-and she might want to buy that asset for 10 bucks before the time is up. This is a covered call option right? And after
-Alice and Bob initiate this contract, the spot price of the asset starts going up. Imagine Alice now wants some other
-asset which Fred happens to have, so she offers Fred to exchange her covered call option for the asset Fred posseses.
-The right to buy the asset from 10 bucks is itself an eright and Alice is using this eright to trade for another asset.
+İkinci derste, sözleşmelerin karşılıklı olarak şüpheli taraflar arasında hakların ticaretini nasıl mümkün kıldığını ve bu sistemin işlemesi için neden bir `Sözleşme Ev Sahibi`'ne ihtiyaç duyulduğunu anlatmıştık. Alice'nin bir süreliğine bir varlığı tutması için Bob'a ödeme yaptığını ve süre dolmadan önce bu varlığı 10 dolar karşılığında satın almak isteyebileceğini düşünelim. Bu bir opsiyon hakkı değil mi? Ve Alice ve Bob bu sözleşmeyi başlattıktan sonra, varlığın spot fiyatı yükselmeye başlar. Şimdi Alice, Fred'in sahip olduğu başka bir varlık istiyor, bu yüzden Fred'e opsiyon hakkını Fred'in sahip olduğu varlıkla takas etmeyi teklif ediyor. 10 dolar karşılığında varlığı satın alma hakkı kendisi bir eright'tir ve Alice bu eright'ı başka bir varlıkla ticaret yapmak için kullanıyor.
 
-This brings us to the below situation;
+Bu bizi aşağıdaki duruma getirir;
 
 <img src="./images/layeredGames.png" width='60%'>
 
-Remember what features an electronic right must have in order to be classified as an eright?
-* Exclusive
-* Assayable
+Elektronik bir hakın bir eright olarak sınıflandırılabilmesi için hangi özelliklere sahip olması gerektiğini hatırlıyor musunuz?
+* Özel
+* Analiz Edilebilir
 
-In order to achieve both of the above features we must introduce a trusted third party. In ERTP we call this party
-an `Issuer`. This brings us to the question: Who is the issuer of Alice's right to exercise the covered call option?
+Yukarıdaki her iki özelliği de elde etmek için güvenilir bir üçüncü tarafın tanıtılması gerekiyor. ERTP'de bu tarafa `Issuer` (Düzenleyici) diyoruz. Bu bizi şu soruya getirir: Alice'in opsiyon hakkını kullanma hakkının düzenleyicisi kimdir?
 
-### Invitation
-Invitations are, in fact, `Payment`s. Let's try to understand this design choice by trying to answer the questions below;
-* Who's the issuer of invitations?
-    * Does it have one issuer? Or every contract has its own invitation issuer?
-* What's the `AssetKind` of these invitations?
-* What kind of benefits are we getting when we create invitations as ERTP assets?
+### Davet
+Davetler, aslında `Payment`'lerdir (Ödemelerdir). Bu tasarım seçimini anlamaya çalışalım;
+* Davetlerin düzenleyicisi kimdir?
+    * Tek bir düzenleyicisi mi var? Yoksa her sözleşmenin kendi davet düzenleyicisi mi var?
+* Davetlerin `AssetKind`'ı nedir?
+* Davetleri ERTP varlıkları olarak oluşturduğumuzda hangi tür faydalar elde ediyoruz?
 
-#### Who's the issuer of invitations?
-Remember how to create invitations? Invitations are created using `Zoe Contract Facet` using the below method;
+#### Davetlerin düzenleyicisi kimdir?
+Davetlerin nasıl oluşturulduğunu hatırlıyor musunuz? Davetler, aşağıdaki yöntemi kullanarak `Zoe Contract Facet` ile oluşturulur;
 
 ```js
 const invitation = zcf.makeInvitation(offerHandler, 'Description', customProperties = undefined, proposalShape = undefined);
 ```
 
-So this means that invitations can only be created from a contract. [Agoric Docs](https://docs.agoric.com/reference/zoe-api/zoe.html#e-zoe-getinvitationissuer)
-has a useful sample like below:
+Bu, davetlerin yalnızca bir sözleşmeden oluşturulabileceği anlamına gelir. [Agoric Docs](https://docs.agoric.com/reference/zoe-api/zoe.html#e-zoe-getinvitationissuer) üzerinde aşağıdaki gibi yararlı bir örnek vardır:
 
 ```js
 const invitationIssuer = await E(Zoe).getInvitationIssuer();
-// Here a user, Bob, has received an untrusted invitation from Alice.
-// Bob uses the trusted **InvitationIssuer** from Zoe to
-// transform the untrusted invitation to a trusted one
+// Burada bir kullanıcı olan Bob, Alice'den güvenilmeyen bir davet aldı.
+// Bob, Zoe'den alınan güvenilir **InvitationIssuer**'i kullanarak
+// güvenilmeyen daveti güvenilir bir davete dönüştürür
 const trustedInvitation = await invitationIssuer.claim(untrustedInvitation);
 const { value: invitationValue } =
     await E(invitationIssuer).getAmountOf(trustedInvitation);
 ```
 
-Above code snippet showcases how Alice approaches to an untrusted invitation. Steps she follows;
-1. Get the source of trust for the invitation
-2. Verify the invitation using the `issuer.claim()` method of ERTP
-3. Check the data inside the verified invitation
+Yukarıdaki kod parçacığı, Alice'in güvenilmeyen bir davete nasıl yaklaştığını gösterir. İzlediği adımlar;
+1. Davetin güven kaynağını alır
+2. Daveti, ERTP'nin `issuer.claim()` yöntemi kullanılarak doğrular
+3. Doğrulanmış davetin içindeki verileri kontrol eder
 
-Step one clearly answers our question of "_Who's the issuer of invitations?_", notice that we fetch the `invitationIssuer`
-from Zoe. Without specifying any instance or installation or any other type of arguments. So we can confidently say
-that: Zoe(Contract Host) is the issuer of all invitations.
+Birinci adım, "_Davetlerin düzenleyicisi kimdir?_" sorumuzun açıkça cevabını verir, `invitationIssuer`'ı Zoe'den alırız. Herhangi bir örnek, kurulum veya başka türden argümanları belirtmeden. Dolayısıyla, tüm davetlerin düzenleyicisinin Zoe (Sözleşme Ev Sahibi) olduğunu güvenle söyleyebiliriz.
 
-#### What's the `AssetKind` of these invitations?
-This question is already answered in the above section but in an implicit way. Notice the third argument
-of `zcf.makeInvitation()`:
+#### Davetlerin `AssetKind`'ı nedir?
+Bu soru, yukarıdaki bölümde zaten yanıtlandı ancak dolaylı bir şekilde. `zcf.makeInvitation()`'ın üçüncü argümanına dikkat edin:
 
 ```js
 const invitation = zcf.makeInvitation(offerHandler, 'Description', customProperties = undefined, proposalShape = undefined);
 ```
 
-The argument `customProperties` is and `Object` that goes into the value of the invitation payment so that clients,
-like Alice, can use its data to establish trust to the invitation itself. So we can conclude that our invitations are
-`non-fungible`, this means that the assetKind is `COPY_SET`.
+`customProperties` argümanı, davetin değerine giden bir `Nesne`dir, böylece müşteriler, Alice gibi, verilerini kullanarak davete güven oluşturabilir. Bu nedenle, davetlerimizin `non-fungible` (birbirinin yerine geçemeyen) olduğunu ve bu durumda varlık türünün `COPY_SET` olduğunu sonuçlayabiliriz.
 
-#### What kind of benefits are we getting when we create invitations as ERTP assets?
-Let's go back to our example in the [Derived erights]() section. What would happen if Alice offered to hand over a userSeat
-instead of an invitation? Could Fred trust that the userSeat is actually will return him the covered call option?
-Unfortunately Fred has no way to make sure that the object Alice claims to be a seat that will return the right to
-exercise the covered call option is actually what Alice says it is and not an arbitrary object. On the other hand, if
-Fred gets that seat via exercising an invitation, he will have the below guatantees;
+#### Davetleri ERTP varlıkları olarak oluşturduğumuzda hangi tür faydalar elde ediyoruz?
 
-* The invite is relevant to this contract (otherwise the contract does not give a seat in return)
-* The seat that is handed by the contract directly is the one that runs according to the contract
+[Türetilmiş erights]() bölümündeki örneğimize geri dönelim. Alice, bir davet yerine bir kullanıcıKoltuğu sunsaydı ne olurdu? Fred, kullanıcıKoltuğunun gerçekten ona kapalı çağrı opsiyonunu döndüreceğine güvenebilir miydi? Maalesef Fred, Alice'in kapalı çağrı opsiyonunu kullanma hakkını döndürecek bir koltuk olduğunu iddia ettiği nesnenin gerçekten Alice'in söylediği şey olduğundan ve keyfi bir nesne olmadığından emin olmanın bir yoluna sahip değil. Öte yandan, eğer Fred bu koltuğu bir daveti kullanarak alırsa, aşağıdaki garantilere sahip olur;
 
-The reasoning behind Fred being able to have the above guarantees is described in [this section](https://docs.agoric.com/reference/zoe-api/zoe.html#e-zoe-getinvitationdetails-invitation)
-of the Agoric docs which is showcases by below code snippet:
+* Davet, bu sözleşme ile ilgilidir (aksi takdirde sözleşme karşılığında bir koltuk vermez)
+* Sözleşmenin doğrudan verdiği koltuk, sözleşmeye göre çalışandır
+
+Fred'in yukarıdaki garantilere sahip olabilmesinin nedeni, Agoric belgelerindeki [bu bölümde](https://docs.agoric.com/reference/zoe-api/zoe.html#e-zoe-getinvitationdetails-invitation) açıklanmıştır ve aşağıdaki kod parçacığı ile gösterilmiştir:
 
 ```js
 const invitation = await invitationIssuer.claim(untrustedInvitation);
 const invitationValue = await E(Zoe).getInvitationDetails(invitation);
 ```
 
-Since a invitations is a non-fungible ERTP asset, we can its values are the type `Object`. Zoe lets us read the value
-of a given invitation in a convenient way using `await E(Zoe).getInvitationDetails(invitation)`. Note that this
-operation is equivalent of;
+Bir davet, non-fungible bir ERTP varlığı olduğundan, değerlerinin `Object` türünde olduğunu biliyoruz. Zoe, `await E(Zoe).getInvitationDetails(invitation)` kullanarak belirli bir davetin değerini rahat bir şekilde okumamıza izin verir. Bu işlemin 
 
 ```js
 const { value: invitationValue } = await E(invitationIssuer).getAmountOf(trustedInvitation);
 ```
 
-the method above because Zoe already knows the `invitationIssuer`.
+yukarıdaki metotla eşdeğer olduğunu unutmayın, çünkü Zoe zaten `invitationIssuer`ı bilir.
 
-The contents of an invitaion's value is as follows:
+Bir davetin değerinin içeriği aşağıdaki gibidir:
 
 ```js
 const invitationValue = {
-  installation, // The contract's Zoe installation.
-  instance, // The contract instance this invitation is for.
-  invitationHandle, // A Handle used to refer to this Invitation.
-  description, // Describes the purpose of this Invitation. Use it to match the invitation to the role it plays in the contract.
-  ?customProperties, // Developer passes this for clients to do further inspections in order to achieve the trust 
+  installation, // Sözleşmenin Zoe kurulumu.
+  instance, // Bu davetin için olduğu sözleşme örneği.
+  invitationHandle, // Bu Davete atıfta bulunmak için kullanılan bir Handle.
+  description, // Bu Davetin amacını açıklar. Daveti, sözleşmedeki rolü ile eşleştirmek için kullanın.
+  ?customProperties, // Geliştirici, müşterilerin güven sağlamak için daha fazla inceleme yapmaları için bunu geçer
 }
 ```
 
-Fred can use the above information to compare against the data he trusts and willing to do business with.
+Fred, yukarıdaki bilgileri kullanarak güvendiği ve iş yapmayı istediği verilerle karşılaştırabilir.
 
-There's one more guarantee that an invitation provides over using a simple object. Can you imagine what it is?
+Bir davetin, basit bir nesne kullanmanın üzerinde bir garanti daha sağladığı var. Bunun ne olduğunu tahmin edebilir misiniz?
 
-* Hint: **Invitations are Payments.**
+* İpucu: **Davetler ödemelerdir.**
 
-Okay we achieved the assyability thanks to the `Issuer`. What about exclusivity? Invitations are burned when offers
-are exercised. Thus we can make sure one invitation is only used ONCE. So Fred can know he's the only one exercised this
-right.
+Tamam, `Issuer` sayesinde doğrulama özelliğini başardık. Peki ya tekil özellik? Teklifler uygulandığında davetler yakılır. Böylece bir davetin yalnızca BİR KEZ kullanıldığından emin olabiliriz. Yani Fred, bu hakkı yalnızca kendisinin kullandığını bilebilir.
 
-#### How do intivations help to achieve `Higher-Order Composition`?
-So far we've been talking about how invitations work and what they actually are. Great, but how does it help from the
-higher-order composition point of view?
+#### Davetler, `Üst-Düzey Kompozisyon`u nasıl sağlar?
+Şimdiye kadar davetlerin nasıl çalıştığı ve ne oldukları hakkında konuştuk. Harika, ama üst düzey kompozisyon bakış açısından bu nasıl yardımcı olur?
 
-1. First of all, when we observe how to create an invitation:
+1. İlk olarak, bir davet oluşturma şeklimizi gözlemleyelim:
   ```js
   const invitation = zcf.makeInvitation(offerHandler, 'Description', customProperties = undefined, proposalShape = undefined);
   ```
 
-Notice that `offerHandler` is actually a function. So invitaions make use of `Higher-Order Functions`.
+`offerHandler`ın aslında bir fonksiyon olduğunu fark edin. Yani davetler, `Üst-Düzey Fonksiyonları` kullanır.
 
-2. They help us to securely trade derived erights which is a higher-order version of the underlying eright.
-
+2. Türetilmiş erights'ın güvenli bir şekilde ticaretini yapmamıza yardımcı olurlar ki bu, temel eright'ın üst düzey bir versiyonudur.
 
 
 ### Reusable Smart Contracts
