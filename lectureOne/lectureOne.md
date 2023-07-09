@@ -1,64 +1,62 @@
-# Lecture One - Introduction To Agoric and Hardened JavaScript
-## Table of Contents
-* What is Agoric?
-  * What does it aim to bring to the ecosystem?
-  * Who builds it?
-  * Agoric's position in the Cosmos ecosystem
-  * The Agoric Stack
-* Hardened JavaScript
-  * What is Hardened JavaScript? 
-  * History of `Hardened JavaScript`/`SES`
-  * Keywords, Terminology
-  * Execution Environment
-  * Parts Of Hardened JavaScript
-  * Coding Samples
-* Communicating With Remote Objects
+# Ders Bir - Agoric ve Sertleştirilmiş JavaScript'a Giriş
+## İçindekiler
+* Agoric nedir?
+  * Ekosisteme ne getirmeyi amaçlar?
+  * Kim yapar?
+  * Agoric'in Cosmos ekosistemindeki yeri
+  * Agoric Stack
+* Sertleştirilmiş JavaScript
+  * Sertleştirilmiş JavaScript nedir? 
+  * `Sertleştirilmiş JavaScript`/`SES` tarihçesi
+  * Anahtar kelimeler, Terminoloji
+  * Çalışma Ortamı
+  * Sertleştirilmiş JavaScript'in Bölümleri
+  * Kodlama Örnekleri
+* Uzak Nesnelerle İletişim Kurma
 
-## What is Hardened JavaScript?
-Hardened JavaScript is perhaps the most important part of Agoric's JavaScript Framework. Its main purpose is to make JavaScript development secure from
-internal threats.
+## Sertleştirilmiş JavaScript Nedir?
+Sertleştirilmiş JavaScript, belki de Agoric'in JavaScript Çerçevesinin en önemli parçasıdır. Ana amacı, JavaScript geliştirmeyi iç tehditlerden güvenli hale getirmektir.
 
 <img src="./images/jsFeatures.png" width='60%'>
 
-_Figure 1: JavaScript Language Features_
-> Above screenshot is taken from [Hardened JavaScript Security Report](https://assets.ctfassets.net/xm0kp9xt5r54/5yM6whKLuiTTCvXQiSw0xe/24bc9532c5ed26f429ec7354095b491e/Hardened-JavaScript.pdf).
+_Şekil 1: JavaScript Dil Özellikleri_
+> Yukarıdaki ekran görüntüsü [Sertleştirilmiş JavaScript Güvenlik Raporu](https://assets.ctfassets.net/xm0kp9xt5r54/5yM6whKLuiTTCvXQiSw0xe/24bc9532c5ed26f429ec7354095b491e/Hardened-JavaScript.pdf)'ndan alınmıştır.
 
-The [SES Guide](https://github.com/endojs/endo/blob/master/packages/ses/docs/guide.md) from the docs describes `Hardened JavaScript` as below;
-- Is a JavaScript runtime library for safely running third-party code.
-- Addresses JavaScript’s lack of internal security.
-  - This is particularly significant because JavaScript applications
-    use and rely on third-party code (modules, packages, libraries,
-    user-provided code for extensions and plug-ins, etc.).
-- Enforces best practices by removing hazardous features such as global
-  mutable state and lack of encapsulation in sloppy mode.
-- Is a safe deterministic subset of "strict mode" JavaScript.
-- Does not include any IO objects that provide
+Belgelerdeki [SES Rehberi](https://github.com/endojs/endo/blob/master/packages/ses/docs/guide.md) `Sertleştirilmiş JavaScript`i aşağıdaki gibi tanımlar;
+- Üçüncü taraf kodun güvenli bir şekilde çalıştırılması için bir JavaScript çalışma zamanı kütüphanesidir.
+- JavaScript’in iç güvenlik eksikliğini ele alır.
+  - Bu, özellikle JavaScript uygulamalarının
+    üçüncü taraf kodları (modüller, paketler, kütüphaneler,
+    eklentiler ve plug-in'ler için kullanıcı tarafından sağlanan kodlar vb.) kullanması ve bunlara güvenmesi nedeniyle önemlidir.
+- Küresel
+  değişebilir durumlar gibi tehlikeli özelliklerin kaldırılması suretiyle en iyi uygulamaları zorlar ve gevşek modda kapsüllemenin eksikliğini ele alır.
+- "Strict mode" JavaScript'in güvenli belirlenmiş bir alt kümesidir.
+- Herhangi bir IO nesnesini içermez
   [*ambient authority*](https://en.wikipedia.org/wiki/Ambient_authority).
-- Removes non-determinism by modifying a few built-in objects.
-- Adds functionality to freeze and make immutable both built-in JavaScript
-  objects and program created objects.
+- Bazı yerleşik nesneleri değiştirerek belirsizliği kaldırır.
+- Hem yerleşik JavaScript
+  nesnelerini hem de program oluşturulan nesneleri dondurma ve değiştirilemez hale getirme işlevselliği ekler.
 
-### Principles of Hardened JavaScript
-`Hardened JavaScript` aims to bring security to JavaScript by actually removing insecurities. In order to enforce security, it relies on 
-two principles;
-* **OCaps(Object Capabilities)**: _SES Guide[4]_ describes OCaps discipline as below;<br>
-  "Any programming environment fitting the OCaps model satisfies three requirements:
-  * Any program can protect its invariants by hiding its own data and capabilities.
-  * Power can only be exercised over something by having a reference to the object providing that power, for example, a file system object. 
-  A reference to a powerful object is a capability.
-  * The only way to get a capability is by being given one. For example, by receiving one as an argument of a constructor or method."
+### Sertleştirilmiş JavaScript'in Prensipleri
+`Sertleştirilmiş JavaScript`, aslında güvensizlikleri ortadan kaldırarak JavaScript'e güvenlik getirmeyi amaçlar. Güvenliği sağlamak için 
+iki prensipe dayanır;
+* **OCaps(Nesne Yetenekleri):** _SES Rehberi[4]_ OCaps disiplinini aşağıdaki gibi tanımlar;<br>
+  "Herhangi bir programlama ortamı OCaps modeline uyuyorsa, üç gerekliliği karşılar:
+  * Herhangi bir program, kendi verilerini ve yeteneklerini gizleyerek kendi değişmezlerini koruyabilir.
+  * Güç, sadece bir nesnenin referansına sahip olmakla, örneğin, bir dosya sistemi nesnesine, bir şey üzerinde kullanılabilir. 
+  Güçlü bir nesneye bir referans, bir yetenektir.
+  * Bir yeteneği elde etmenin tek yolu, bir tanesi verilmesidir. Örneğin, bir yapılandırıcı veya yöntemin bir argümanı olarak bir tanesini almak."
   
-  _SES Guide[4]_ also adds: "With OCaps, many strangers can collaborate in a single sandbox, without risking them frustrating, interfering, 
-  or conspiring with or against the user or each other."
+  _SES Rehberi[4]_ ayrıca ekler: "OCaps ile, birçok yabancı, kullanıcıya veya birbirlerine karşı onları rahatsız etme, müdahale etme veya 
+  işbirliği yapma riski olmadan tek bir kum havuzunda işbirliği yapabilir."
 
 
-* **POLA(Principle of Least Authority):** A general definition might be;
+* **POLA(En Az Yetki Prensibi):** Genel bir tanım şu şekilde olabilir;
 
-  "_The Principle of Least Authority (POLA) says that code should be granted only the authority it needs to perform its task and no more._"[5]
+  "_En Az Yetki Prensibi (POLA), kodun görevini gerçekleştirmek için ihtiyaç duyduğu yetkiye ve fazlasına sahip olmaması gerektiğini söyler._"[5]
 
-  `Hardened JavaScript` does not directly enforce `POLA` but implements a rich toolset so that the programmers can hand out necessary authorities,
-and no more, to their modules.
-
+  `Sertleştirilmiş JavaScript` doğrudan `POLA`yı uygulamaz, ancak programcıların modüllerine gereken yetkileri,
+ve fazlasını değil, dağıtabilmeleri için zengin bir araç seti uygular.
 ### What do you mean by "internal threats"?
 What happens if a program your code depends on, misbehaves? What happens if it overrides the `Array.prototype.push` method?
 With the normal JavaScript, there's nothing prevents something like below;
