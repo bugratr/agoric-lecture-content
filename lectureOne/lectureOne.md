@@ -57,9 +57,8 @@ iki prensipe dayanır;
 
   `Sertleştirilmiş JavaScript` doğrudan `POLA`yı uygulamaz, ancak programcıların modüllerine gereken yetkileri,
 ve fazlasını değil, dağıtabilmeleri için zengin bir araç seti uygular.
-### What do you mean by "internal threats"?
-What happens if a program your code depends on, misbehaves? What happens if it overrides the `Array.prototype.push` method?
-With the normal JavaScript, there's nothing prevents something like below;
+### "İç tehditler" derken neyi kastediyorsunuz?
+Kodunuzun bağımlı olduğu bir program ters davranırsa ne olur? Ya `Array.prototype.push` metodunu geçersiz kılarsa? Normal JavaScript ile aşağıdakine benzer bir şeyi önleyecek bir şey yoktur;
 ```js
 const push = Array.prototype.push;
 Array.prototype.push = (...args) => {
@@ -67,58 +66,60 @@ Array.prototype.push = (...args) => {
   return push.apply(this, args);
 };
 ```
-> **Note**: The code sample above is taken from [Hardened JavaScript(10:34)](https://www.youtube.com/watch?v=RZ7bBIU8DRc).
+> **Not**: Yukarıdaki kod örneği [Sertleştirilmiş JavaScript(10:34)](https://www.youtube.com/watch?v=RZ7bBIU8DRc)'ten alınmıştır.
 
-[Moddable](https://github.com/Moddable-OpenSource/moddable) describes `Hardened JavaScript` in their blog like this;
+[Moddable](https://github.com/Moddable-OpenSource/moddable) bloglarında `Sertleştirilmiş JavaScript`i şu şekilde tanımlar;
 
-"_The core problem SES solves is allowing code from different sources to be safely executed in a single JavaScript virtual machine. 
-This ensures each section of code is secure from interference by the others._"
+"_SES'in çözdüğü temel sorun, farklı kaynaklardan gelen kodun tek bir JavaScript sanal makinesinde güvenli bir şekilde çalıştırılabilmesini sağlamaktır. 
+Bu, her kod bölümünün diğerlerinden müdahaleye karşı güvende olduğunu garanti eder._"
 
-## `Hardened JavaScript` or `SES`?
-`Hardened JavaScript` is what formerly known as `SES`. SES stands for `Secure ECMAScript`. Along this bootcamp, documents we refer to and
-in JavaScript community in general, the terms `SES` and `Hardened JavaScript` are used interchangeably.
+## `Sertleştirilmiş JavaScript` mı `SES` mi?
+`Sertleştirilmiş JavaScript`, `SES` olarak bilinen şeydir. SES, `Secure ECMAScript`i ifade eder. Bu bootcamp boyunca ve genel olarak JavaScript topluluğunda, 
+`SES` ve `Sertleştirilmiş JavaScript` terimleri birbirinin yerine kullanılır.
 
-### Background Work
-There exists two proposals made to [Ecma TC39](https://github.com/tc39) for making `Hardened JavaScript` the _Standard JavaScript_;
+### Arka Plan Çalışması
+`Sertleştirilmiş JavaScript`i _Standart JavaScript_ haline getirmek için [Ecma TC39](https://github.com/tc39)'a yapılan iki teklif bulunmaktadır;
 1. [proposal-ses](https://github.com/tc39/proposal-ses)
 2. [proposal-compartments](https://github.com/tc39/proposal-compartments)
 
-Number 2 superseeds the number 1. Current stage is `Stage 1`.
+Numara 2, numara 1'i geçersiz kılar. Şu anki aşama `Aşama 1`.
 
-## Keywords, Terminology
-* **Endo**: What Node.js does for JavaScript, Endo does for Hardened JavaScript. Endo loads packages and modules in an ECMAScript module loader that isolates every package,
-granting limited access to the host's resources. Agoric smart contracts are an example of Endo guest programs. [2]
-* **Shim**: A shim is a piece of code used to correct the behavior of code that already exists, usually by adding new API that works around the problem.[3]
-* **JS Intrinsics/Primordials:** Built-in JavaScript objects such as `Object`, `Array`, and `RegExp`.
-* **Realm**: A realm is the set of primordial (objects and standard library functions like Array.prototype.push) and a global object. 
-In a web browser, an iframe is a realm. In Node.js, a Node process is a realm. [1]
+## Anahtar Kelimeler, Terminoloji
+* **Endo**: Node.js'in JavaScript için yaptığı şeyi, Endo Sertleştirilmiş JavaScript için yapar. Endo, her paketi izole eden bir ECMAScript modül yükleyicisinde paketleri ve modülleri yükler,
+host'un kaynaklarına sınırlı erişim sağlar. Agoric akıllı sözleşmeleri, Endo konuk programlarının bir örneğidir. [2]
+* **Shim**: Bir shim, genellikle sorunu çözecek yeni bir API ekleyerek zaten mevcut olan kodun davranışını düzeltmek için kullanılan bir kod parçasıdır.[3]
+* **JS İçsel/Primordials:** `Object`, `Array` ve `RegExp` gibi yerleşik JavaScript nesneleri.
+* **Realm**: Bir realm, bir global obje ve ilk öğelerin (örneğin Array.prototype.push gibi nesneler ve standart kütüphane fonksiyonları) setidir. 
+Bir web tarayıcısında, bir iframe bir realmdir. Node.js'de, bir Node işlemi bir realmdir. [1]
 
-## Execution Environment
+## Çalışma Ortamı
 ![](images/executionEnvironment.png)
 
 _Figure 2: JavaScript Runtime Environment Example_
 
-_According to the Agoric Docs[6]_, Agoric adopts the same event-loop concurrency model as web browsers and Node.js. Every event-loop has a message queue, stack and
-a heap of objects. Agoric refers to this event-loop as `vat`.
+_Agoric Belgeleri[6]'na göre_, Agoric, web tarayıcıları ve Node.js ile aynı olay döngüsü eşzamanlılık modelini benimser. Her olay döngüsünün bir mesaj kuyruğu, bir yığın ve
+bir nesne yığını vardır. Agoric, bu olay döngüsüne `vat` adını verir.
 
-One important thing to note is, synchronous function calls can only be used within a `vat`. For vat-to-vat communications we need to use `eventual-send`, but 
-`evetual-send` calls can also be used within the same `vat`.
+Not edilmesi gereken önemli bir şey, eşzamanlı fonksiyon çağrıları yalnızca bir `vat` içinde kullanılabilir. Vat-vat iletişimleri için `eventual-send`i kullanmamız gerekir, ancak 
+`evetual-send` çağrıları da aynı `vat` iç
 
-> If you don't know what `eventual-send` means, don't worry. We'll cover in the `Communicating With Remote Objects` section.
+inde kullanılabilir.
 
-### Static vs Dynamic Vats
-There two types of `vats`:
-* Static Vats
-* Dynamic Vats
+> `Eventual-send`in ne anlama geldiğini bilmiyorsanız endişelenmeyin. `Uzaktaki Nesnelerle İletişim Kurma` bölümünde üzerinde duracağız.
 
-`Static Vats` are started at the system boot. Each static vat contains a specific `agoric-sdk` component. `Static Vats` are needed to keep the ecosystem going.
+### Statik vs Dinamik Vatlar
+İki tür `vat` vardır:
+* Statik Vatlar
+* Dinamik Vatlar
 
-`Dynamic Vats` run the third party code. For instance, if you deploy a smart contract it runs in its own vat. This is an important point, 
-`Smart Contracts` run in their own vats. Can you think of what kind benefits approach can bring?
+`Statik Vatlar` sistem başlangıcında başlatılır. Her statik vat, belirli bir `agoric-sdk` bileşenini içerir. `Statik Vatlar`, ekosistemin devam etmesi için gereklidir.
+
+`Dinamik Vatlar` üçüncü taraf kodunu çalıştırır. Örneğin, bir akıllı sözleşme dağıtırsanız kendi vatında çalışır. Bu önemli bir noktadır, 
+`Akıllı Sözleşmeler` kendi vatlarında çalışır. Bu yaklaşımın ne tür faydalar getirebileceğini düşünebilir misiniz?
 
 <img src='./images/vats.png' width='60%'>
 
-> **Figure 3:** Screenshot from [Distributed Programming for a Decentralized World](https://www.youtube.com/watch?v=52SgGFpWjsY&list=PLzDw4TTug5O1oHRbp2HkcvKABAY9FKsmG)
+> **Şekil 3:** [Dağıtılmış Programlama için Merkezi Olmayan Dünya](https://www.youtube.com/watch?v=52SgGFpWjsY&list=PLzDw4TTug5O1oHRbp2HkcvKABAY9FKsmG) ekran görüntüsü.
 
 Possible hosts for `vats`:
 * **Blockchain:** When a contract is deployed to blockchain, all nodes in that network runs the contract in their machine. If there are 10 nodes then are 10 vats for
