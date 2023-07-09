@@ -121,84 +121,79 @@ inde kullanılabilir.
 
 > **Şekil 3:** [Dağıtılmış Programlama için Merkezi Olmayan Dünya](https://www.youtube.com/watch?v=52SgGFpWjsY&list=PLzDw4TTug5O1oHRbp2HkcvKABAY9FKsmG) ekran görüntüsü.
 
-Possible hosts for `vats`:
-* **Blockchain:** When a contract is deployed to blockchain, all nodes in that network runs the contract in their machine. If there are 10 nodes then are 10 vats for
-the particular contract. But notice how all `vats` in a public chain(bottom layer) is represented as single vats in the green(top) layer. This is an abstraction
-that the replicated nature of the blockchain enables.
-* **Ag-Solo:** This is the client interacting with the agoric chain which runs on a solo machine. But from the point of abstraction green layer brings, 
-it's just another `vat` that is ready to interact with other vats.
+`Vats` için olası ana makineler:
+* **Blockchain:** Bir sözleşme blockchain'e dağıtıldığında, bu ağdaki tüm düğümler sözleşmeyi kendi makinelerinde çalıştırır. Eğer 10 düğüm varsa, belirli bir sözleşme için 10 tane `vat` bulunur. Ancak tüm `vats`'ların bir kamu zinciri(alt katman) olarak tek `vat`lar şeklinde yeşil(üst) katmanda temsil edildiğine dikkat edin. Bu, blockchain'in çoğaltılmış doğasının sağladığı bir soyutlamadır.
+* **Ag-Solo:** Bu, solo bir makinede çalışan agoric zinciri ile etkileşimde bulunan istemcidir. Ancak yeşil katmanın getirdiği soyutlama açısından, bu sadece diğer vatlarla etkileşime girmeye hazır başka bir `vat`tır.
 
-## Parts Of Hardened JavaScript
-`Hardened JavaScript` enforces security to the language. Great, but how? 
+## Hardened JavaScript'ın Parçaları
+`Hardened JavaScript`, dile güvenlik uygular. Harika, ama nasıl? 
 
-In order to achieve security by `POLA` and `Ocaps`, we must first take a look at why JavaScript is not a OCaps enforcing language.
-According to the **SES Guide[4]**:
+`POLA` ve `Ocaps` tarafından güvenliği sağlamak için öncelikle JavaScript'in neden bir Ocaps uygulayan dil olmadığına bakmalıyız.
+**SES Rehberi[4]**'ne göre:
 
 "Ordinary JavaScript does not fully qualify as an OCaps language due to the pervasive mutability of shared objects."
 
-Our code sample in `What do you mean by "internal threats"?` section is a good example for this.
+`What do you mean by "internal threats"?` başlıklı bölümdeki kod örneğimiz buna iyi bir örnektir.
 
-In the guide it says;
+Rehberde şöyle deniyor;
 
-"_Hardened JavaScript consists of three parts:_
+"_Hardened JavaScript üç parçadan oluşur:_
 
-* _`Lockdown` is a function that irreversibly repairs and hardens an existing mutable JavaScript environment._
-* _`Harden` is a function that makes interfaces tamper-proof, so objects can be shared between programs._
-* _`Compartment` is a class that constructs isolated environments, with separate globals and modules, but shared hardened primordials and limited access to other powerful objects in global scope._"
+* _`Lockdown` işlemi, mevcut bir değiştirilebilir JavaScript ortamını düzeltir ve sertleştirir._
+* _`Harden` işlemi, nesnelerin programlar arasında paylaşılabileceği şekilde arayüzleri hileye dayanıklı hale getirir._
+* _`Compartment` sınıfı, ayrı genel ve modülleri olan, ancak sertleştirilmiş birincil öğeleri paylaşan ve genel kapsamdaki diğer güçlü nesnelere sınırlı erişimi olan izole ortamlar oluşturur._"
 
-Let's examine these three main parts one-by-one;
+Bu üç ana parçayı birer birer inceleyelim;
 
 ### Lockdown
-According to the _SES Guide - Lockdown[7]_, the definition of `lockdown` is:
+_SES Rehberi - Lockdown[7]_'a göre, `lockdown`'ın tanımı şöyle:
 
-"lockdown() freezes all JavaScript defined objects accessible to any program in the execution environment. 
-Calling lockdown() turns a JavaScript system into a hardened system, with enforced OCap (object-capability) security. 
-It alters the surrounding execution environment (realm) such that no two programs running in the same realm can observe or 
-interfere with each other until they have been introduced."
+"lockdown() fonksiyonu, çalıştırma ortamındaki herhangi bir program tarafından erişilebilen tüm JavaScript tanımlı nesneleri dondurur. 
+Lockdown() çağrısı, bir JavaScript sistemini, uygulanan OCap (nesne yetenek) güvenliği olan bir sertleştirilmiş sistem haline getirir. 
+Etrafındaki çalıştırma ortamını (realm) değiştirir, böylece aynı realm'de çalışan iki program, tanıtılmadan birbirlerini gözlemleyemez veya birbirlerine müdahale edemez."
 
-Here are some of the intrinsic objects `lockdown` freezes;
+`lockdown`'ın dondurduğu bazı içsel nesneler şunlardır;
 
 - `globalThis`
-- `[].__proto__` the array prototype, equivalent to `Array.prototype` in a pristine JavaScript environment.
-- `{}.__proto__` the `Object.prototype`
+- `[].__proto__` dizinin prototipi, temiz bir JavaScript ortamında `Array.prototype`'a denktir.
+- `{}.__proto__` ise `Object.prototype`'a denktir.
 
-And the list goes on... _See Reference - Lockdown[8]_ for more examples.
+Ve liste devam eder... Daha fazla örnek için _Referans - Lockdown[8]_'a bakabilirsiniz.
 
-Is that all? Of course not, `lockdown` also removes some existing, platform specific JavaScript features. Here are some examples;
+Bu kadar mı? Tabii ki hayır, `lockdown` aynı zamanda bazı mevcut, platforma özgü JavaScript özelliklerini de kaldırır. İşte bazı örnekler;
 
 * `queueMicrotask`
-* `URL` and `URLSearchParams`
+* `URL` ve `URLSearchParams`
 * `WebAssembly`
-* `TextEncoder` and `TextDecoder`
+* `TextEncoder` ve `TextDecoder`
 * `global`
-  * Use `globalThis` instead (and remember it is frozen).
+  * Bunun yerine `globalThis`'i kullanın (ve dondurulduğunu unutmayın).
 * `process`
-  * No `process.env` to access the process's environment variables.
-  * No `process.argv` for the argument array.
+  * Sürecin ortam değişkenlerine erişim sağlayan `process.env` yok.
+  * Argüman dizisi için `process.argv` yok.
 
-See _SES Guide - Lockdown Removals[9]_ for more details.
+Daha fazla detay için _SES Guide - Lockdown Removals[9]_'a bakabilirsiniz.
 
-We're still not done. `lockdown` also adds the Hardened JavaScript specific features to the environment.
+Hala bitmedik. `lockdown` ayrıca ortama Sertleştirilmiş JavaScript'e özgü özellikler ekler.
 
-**Remember**: `lockdown` enforces the `SES Shim` and the JavaScript environment is not a Hardened JavaScript environment until 
-`lockdown` is invoked.
+**Unutmayın**: `lockdown`, `SES Shim`'i uygular ve JavaScript ortamı, `lockdown` çağrılana kadar Sertleştirilmiş bir JavaScript ortamı olmaz.
 
-`lockdown` also injects following properties to the `globalThis`;
+`lockdown`, `globalThis`'e aşağıdaki özellikleri de enjekte eder;
 
 * `assert`
 * `harden`
 * `Compartment`
 
-Next, we'll discover `harden`.
+Sonraki aşamada, `harden`'ı keşfedeceğiz.
 
 ### Harden
-Any code that will run inside a vat or a contract can use harden as a global, without importing anything.
-`Harden` tamper-proofs user defined object along with their prototypes. Any program working with that object can only
-invoke whatever is in the surface of that object. Any attempts to subvert the object's properties will fail.
+Bir vat veya sözleşme içinde çalışacak herhangi bir kod, hiçbir şeyi içe aktarmadan `harden`'ı global olarak kullanabilir.
+`Harden`, kullanıcı tanımlı nesneyi ve onların prototiplerini hileye karşı korur. Bu nesneyle çalışan herhangi bir program sadece
+nesnenin yüzeyinde ne varsa onu çağırabilir. Nesnenin özelliklerini alt etmeye yönelik her türlü girişim başarısız olacaktır.
 
 ```js
 const makeImportantRecord = () => {
-  const importantData = 'This is very important!';
+  const importantData = 'Bu çok önemli!';
   
   const getImportantData = () => {
     const importantCopy = importantData;
@@ -211,19 +206,19 @@ const makeImportantRecord = () => {
 const importantRecord = makeImportantRecord();
 
 importantRecord.getImportantData = () => {
-  return 'I hate you!'
-}; // This will throw!
+  return 'Seni sevmiyorum!'
+}; // Bu hata verecek!
 ```
 
 ### Compartment
-According to _SES - Compartments[10]_, the definition of `Compartments` is:
+_SES - Compartments[10]_'a göre, `Compartments`'ın tanımı şöyledir:
 
-"A compartment is an evaluation and execution environment with its own globalThis and wholly independent system of modules, 
-but otherwise shares the same batch of intrinsic like Array with the surrounding compartment."
+"Bir compartment, kendi globalThis'ı ve tamamen bağımsız bir modül sistemi olan bir değerlendirme ve çalıştırma ortamıdır,
+ancak çevresel bölme ile aynı grup intrinsic'i paylaşır."
 
-_SES - Compartments[10]_ also contains some code samples for better understanding:
+_SES - Compartments[10]_, daha iyi anlama için bazı kod örnekleri de içerir:
 
-Here, a compartment with `print` endowment is created and invoked.
+Burada, `print` yeteneği olan bir compartment oluşturulmuş ve çağrılmıştır.
 
 ```js
 import 'ses';
@@ -234,11 +229,11 @@ const c = new Compartment({
 });
 
 c.evaluate(`
-  print('Hello! Hello?');
+  print('Merhaba! Merhaba mı?');
 `);
 ```
 
-Different compartments share the same intrinsic but they different `globalThis` objects.
+Farklı compartmentlar, aynı intrinsic'i paylaşır ama farklı `globalThis` nesnelerine sahiptirler.
 
 ```js
 const c1 = new Compartment();
@@ -247,67 +242,67 @@ c1.globalThis === c2.globalThis; // false
 c1.globalThis.JSON === c2.globalThis.JSON; // true
 ```
 
-By default, a new Compartment omits `Date.now` and `Math.random`, since they might covert communication channels between programs.
-But we can add them to the Compartment if we like. There are two ways for achieving this;
+Varsayılan olarak, yeni bir Compartment `Date.now` ve `Math.random`'ı çıkarır, çünkü bunlar programlar arasında gizli iletişim kanalları olabilir.
+Ama eğer istersek, bunları Compartment'a ekleyebiliriz. Bunu başarmak için iki yol vardır;
 
-* The first argument to the compartment constructor or
-* By assigning them to the compartment's globalThis after construction.
+* Compartment yapıcıya ilk argüman olarak veya
+* Yapım sonrasında onları compartment'ın globalThis'ına atayarak.
 
 ```js
 const powerfulCompartment = new Compartment({ Math });
 powerfulCompartment.globalThis.Date = Date;
 ```
 
-It's up to the programmer whether to harden `globalThis` of the Compartment. We're able to assign `Date` to the `globalThis` because
-we didn't invoke harden first. 
+Compartment'ın `globalThis`'ını sertleştirmek programcıya bağlıdır. `Date`'i `globalThis`'a atayabiliyoruz çünkü
+ilk olarak harden'ı çağırmadık. 
 
-## Coding Samples
-To use `Hardened JavaScript` in your code, run:
+## Kodlama Örnekleri
+Kodunuzda `Hardened JavaScript` kullanmak için, şunu çalıştırın:
 
 ```shell
 npm install ses
 ```
 
-Then in your code:
+Daha sonra kodunuzda:
 
 ```js
 import 'ses';
 lockdown();
 ```
 
-If your environment is a browser, add this at the top of your `index.html`;
+Eğer ortamınız bir tarayıcı ise, `index.html`'nizin başına bunu ekleyin;
 
 ```html
 <script src="node_modules/ses/dist/ses.umd.min.js">
 ```
 
-Once you do either one of the above, you will have access to `Hardened JavaScript` features.
+Yukarıdakilerden herhangi birini yaptığınızda, `Hardened JavaScript` özelliklerine erişim hakkınız olacak.
 
-_Secure Coding Guide[11]_ has a lot of cool examples, you should definitely check them out.
-I chose below two examples particularly since they seem interesting to me.
+_Secure Coding Guide[11]_, birçok havalı örneğe sahip, kesinlikle göz atmalısınız.
+Ben aşağıdaki iki örneği özellikle seçtim çünkü bana ilginç geldiler.
 
-### Accepting Arrays
-`Array.prototype.concat` concatenates two arrays and returns a new array. An insecure usage might be something like below:
+### Dizileri Kabul Etme
+`Array.prototype.concat`, iki diziyi birleştirir ve yeni bir dizi döndürür. Güvensiz bir kullanım aşağıdaki gibi olabilir:
 
 ```js
-// insecure
+// güvensiz
 function combine(arr1, arr2) {
   const combined = arr1.concat(arr2);
   return combined;
 }
 ```
 
-The guide explains the insecurity like this:
+Kılavuz, güvensizliği şu şekilde açıklar:
 
-"_The problem is that .concat is a property of the first array, which means whoever provides that array gets to control what our alleged "concatenate" function does:_"
+"_Sorun, .concat'ın ilk dizinin bir özelliği olmasıdır, bu da kimin bu diziyi sağladığını kontrol ettiği anlamına gelir:_" 
 
 ```js
 function getArr1(
   return harden({
     concat(otherArray) {
-      console.log("haha I can read", otherArray[0]);
-      otherArray.push("haha I can modify otherArray");
-      return("haha I can make concat return a string, not an Array");
+      console.log("haha okuyabilirim", otherArray[0]);
+      otherArray.push("haha otherArray'ı değiştirebilirim");
+      return("haha concat'ın bir dizi değil, bir string döndürebileceğini gösterdim");
     },
   });
 };
@@ -315,21 +310,21 @@ function getArr1(
 const combined = combine(getArr1(), arr2);
 ```
 
-And the secure version of concatenating two arrays:
+Ve iki diziyi birleştirmenin güvenli versiyonu:
 
 ```js
-// secure
+// güvenli
 function combine(arr1, arr2) {
   const combined = [...arr1, ...arr2];
   return combined;
 }
 ```
 
-### Promises Prevent Reentrancy Hazards
-Consider a PubSub structure like below:
+### Promise'ler Reentrancy Tehlikelerini Önler
+Aşağıdaki gibi bir PubSub yapısı düşünün:
 
 ```js
-// insecure
+// güvensiz
 function makePubSub() {
   const subscribers = new Set();
   function subscribe(cb) {
@@ -347,65 +342,54 @@ function makePubSub() {
 }
 ```
 
-Guide lists the possible insecurities like below:
+Kılavuz, olası güvensizlikleri aşağıdaki gibi listeler:
 
-* if the callback throws an exception, some number of other subscribers won't
-  receive the message
-* if the callback adds a new subscriber, the new subscriber may or may not
-  get called, depending upon the iterator order and where the subscriber
-  lands in the list (note that Sets have improved iteration-ordering
-  properties, so this is not as unpredictable as it would be with other
-  collection types or in other languages)
-* if the callback removes an existing subscriber, they may or may not receive
-  this message, depending upon where they were in the list
-* if the callback publishes a new message, the two messages might be received
-  in different orders by different subscribers
+* eğer callback bir istisna atarsa, bir dizi abone mesajı almayabilir
+* eğer callback yeni bir abone eklerse, yeni abone çağrılıp çağrılmayabilir, yineleyici sırasına ve abonenin listeye nerede yerleştirildiğine bağlıdır (Set'lerin iyileştirilmiş yineleme sıralama özelliklerine sahip olduğunu unutmayın, bu yüzden bu, diğer koleksiyon tipleriyle veya diğer dillerde olduğu kadar öngörülemez değildir)
+* eğer callback mevcut bir aboneyi kaldırırsa, bu mesajı alıp almayacakları, listeye nerede olduklarına bağlı olabilir
+* eğer callback yeni bir mesaj yayınlarsa, iki mesaj, farklı aboneler tarafından farklı sıralarda alınabilir
 
-A sample fix is:
+Bir örnek düzeltme şudur:
 
 ```js
-  // secure
+  // güvenli
   function publish(msg) {
     for (const s of subscribers) {
       Promise.resolve(s).then(s => s(msg));
-    }
   }
 ```
 
-The reason this fixes the reentrancy hazard is that the Promise resolves in a future turn of the event-loop instead of the current one. 
+Bu düzeltmenin reentrancy tehlikesini nasıl giderdiği, Promise'in mevcut etkin döngüsünden ziyade gelecekteki bir döngüde çözülmesi nedeniyledir.
 
-## Communicating With Remote Objects
-Running different components in their own `vat` partitions risk. Imagine if anyone could deploy their contract into 
-the `vat` Zoe(A system component) is running, in the event that one contract tries something malicious like consuming too
-much heap space the whole system would be at risk. This security feature brings a problem to be solved. That is,
-How do you communicate with other `vat`s? For instance, what if your smart contract needs to call a method from
-another smart contract?
+## Uzaktaki Nesnelerle İletişim Kurma
+Farklı bileşenleri kendi `vat`larında çalıştırmak risk oluşturur. Zoe'nin (bir sistem bileşeni) çalıştığı `vat`a herkesin sözleşmelerini yerleştirebildiğini düşünün, bir sözleşme fazla bellek alanı tüketmeyi denediğinde tüm sistem risk altında olabilir. Bu güvenlik özelliği çözülmesi gereken bir sorun getirir. Yani,
+Diğer `vat`'larla nasıl iletişim kurulur? Örneğin, akıllı sözleşmenizin başka bir akıllı sözleşmeden bir yöntem çağırması gerektiğinde ne olur?
 
-### Enter Evantual-Send
-In _Concurrency Among Strangers[12]_ eventual operations explained like below;
+### Evantual-Send'e Hoş Geldiniz
+_Concurrency Among Strangers[12]_ adlı çalışmada eventual işlemler şu şekilde açıklanmıştır;
 
-Imagine a program is executing plan X and discovers the need to engage in plan Y , 
-in a sequential system, it has two simple alternatives of when to do Y :
+Bir programın X planını uygularken Y planına ihtiyaç duyduğunu düşünün, 
+sıralı bir sistemde, Y'yi ne zaman yapacağına dair iki basit alternatifi vardır:
 
-* **Immediately**: Put X aside, work on Y until complete, then go back to X.
-* **Eventually**: Put Y on a “to-do” list and work on it after X is complete.
+* **Hemen**: X'i bir kenara koy, Y üzerinde çalışana kadar devam et, sonra X'e geri dön.
+* **Sonunda**: Y'yi bir "yapılacaklar" listesine koy ve X tamamlandıktan sonra üzerinde çalış.
 
-`Hardened JavaScript` implements an 'eventual-send' package that enables programs to invoke methods from other `vat`s 
-which they have references to. Since eventual operations happen in a future `turn` of the event-loop instead of the 
-current one, there's no reentrancy risk.
+`Hardened JavaScript`, programların başka `vat`lardan
 
-Basic logic of communication between `vat`s is explained in a diagram from _Capability Based Financial Instruments[13]_:
+metotları çağırmasına olanak sağlayan 'eventual-send' paketini uygular. Eventual işlemler, mevcut olandan ziyade bir gelecek 'turn' event-loop'da gerçekleştiği için, yeniden giriş riski yoktur.
+
+`vat`lar arası iletişimin temel mantığı, _Capability Based Financial Instruments[13]_ adlı çalışmadan alınan bir diyagramda açıklanmıştır:
 
 <img src='images/vatCommunication.png' width='60%'>
 
-In the diagram above, 
-* Thick arrows are the methods
-* Thin arrows are the references
-* Circles are the objects
-* Half-circles are the proxy objects that have a connection to the actual `vat`
+Yukarıdaki diyagramda, 
+* Kalın oklar yöntemleri temsil eder
+* İnce oklar referansları temsil eder
+* Daireler nesneleri temsil eder
+* Yarım daireler, gerçek `vat`a bağlantısı olan proxy nesneleridir
 
-Let's say we're Alice and want to invoke a method called `hello` from Bob which takes an argument, a reference to Carol.
-The syntax for that would be:
+Diyelim ki biz Alice'yiz ve Carol'a bir referans alan bir argümanla Bob'dan `hello` adında bir yöntemi çağırmak istiyoruz.
+Söz dizimi şu şekilde olurdu:
 
 ```js
 import { E } from '@endo/far';
@@ -413,30 +397,30 @@ import { E } from '@endo/far';
 E(Bob).hello(Carol);
 ```
 
-This is the syntax whenever we want to interact with another `vat`.
+Bu, başka bir `vat` ile etkileşim kurmak istediğimizde her zaman kullandığımız sözdizimidir.
 
-_Agoric Docs - Eventual Send[14]_ breaks down the steps after we call `E(zoe).install(bundle)` like this:
+_Agoric Docs - Eventual Send[14]_, `E(zoe).install(bundle)` çağrısından sonraki adımları şöyle anlatır:
 
-1. A message consisting of the method name install with the bundle argument [marshaled](https://docs.agoric.com/guides/js-programming/far.html) to a flat string and queued for delivery to the vat that zoe comes from.
-2. E(zoe).install(bundle) returns a promise for the result.
-3. The then and catch methods queue callbacks for when the promise is resolved or rejected. Execution continues until the stack is empty and thus this turn through the event loop completes.
-4. Eventually zoe responds, which results in a new message in this vat's message queue and a new turn through the event loop. The message is de-serialized and the results are passed to the relevant callback.
+1. Zoe'nin geldiği vat'a teslim edilmek üzere sıraya alınan, install yöntem adını ve bundle argümanını düz bir stringe [serileştiren](https://docs.agoric.com/guides/js-programming/far.html) bir mesaj.
+2. E(zoe).install(bundle), sonucun bir sözü verir.
+3. then ve catch yöntemleri, sözün yerine getirilmesi veya reddedilmesi durumunda geri çağrıları sıraya alır. Yürütme, yığın boş olduğunda ve böylece bu event-loop dönüşü tamamlandığında devam eder.
+4. Sonunda zoe yanıt verir, bu da bu vat'ın mesaj sırasında yeni bir mesaj ve event-loop'da yeni bir dönüş anlamına gelir. Mesajın serileştirilmesi geri alınır ve sonuçlar ilgili geri çağrıya geçirilir.
 
-### Is it possible to call every method from an object that lives on another `vat`?
-No. The object should wrap its methods in a `Far`. Only methods wrapped around a `Far` can be invoked from a remote `vat`.
+### Bir başka `vat`ta yaşayan bir nesnenin her metodunu çağırmak mümkün mü?
+Hayır. Nesne, metodlarını bir `Far` ile sarmalamalıdır. Yalnızca bir `Far` etrafında sarılmış metodlar, uzak bir `vat`tan çağrılabilir.
 
-The syntax for `Far` is as below:
+`Far`ın sözdizimi aşağıdaki gibidir:
 
 ```js
 import { Far } from '@endo/far';
 
 const publicFacet = Far('Public Facet', {
-  hello: name => `Hello from remote vat ${name}!!!`
+  hello: name => `Uzaktan vat ${name}!!!`
 })
 ```
 
 
-## Resources
+## Kaynaklar
 [1] [SES Guide - Realms](https://github.com/endojs/endo/blob/master/packages/ses/docs/guide.md#realms)<br>
 [2] [SES Guide - Endo](https://github.com/endojs/endo/blob/master/packages/ses/docs/guide.md#what-is-endo)<br>
 [3] [MDN Glossary - Shim](https://developer.mozilla.org/en-US/docs/Glossary/Shim)<br>
