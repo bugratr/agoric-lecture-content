@@ -199,7 +199,7 @@ export const carol = async (subscriptionP) => {
 };
 ```
 
-If we print the log returned on the function above, assuming we are iterating through Paula's publisher, the result would be:
+Paula'nın yayıncısını yinelediğimizi varsayarak, yukarıdaki işlevde döndürülen günlüğü yazdırırsak, sonuç şöyle olur:
 
 ```js
 [log1:
@@ -215,19 +215,19 @@ log2:
 ];
 ```
 
-## Testing Examples
+## Test Örnekleri
 
-The following examples showcase the effectiveness and functionality of the code studied earlier, as they import and utilize those specific methods.
+Aşağıdaki örnekler, daha önce incelenen kodun etkinliğini ve işlevselliğini sergiler çünkü belirli yöntemleri içe aktarır ve kullanır.
 
 ```js
 import { paula, alice, bob, carol } from "./iterable-testing-tools.js";
 ```
 
-These [tests](https://github.com/Agoric/agoric-sdk/blob/65d3f14c8102993168d2568eed5e6acbcba0c48a/packages/notifier/test/test-subscriber-examples.js) will be done using the `makeSubscriptionKit()`, although the same logic applies when using the `makeNotifierKit()`, as it is explained on sub-chapter [makenotifierkit-vs-makesubscriptionkit](#makenotifierkit-vs-makesubscriptionkit)
+Bu [testler](https://github.com/Agoric/agoric-sdk/blob/65d3f14c8102993168d2568eed5e6acbcba0c48a/packages/notifier/test/test-subscriber-examples.js), `makeSubscriptionKit()` kullanılarak yapılacaktır, ancak aynı mantık `makeNotifierKit()` kullanıldığında da geçerlidir. Bu [makenotifierkit-vs-makesubscriptionkit](#makenotifierkit-vs-makesubscriptionkit) alt bölümde açıklanmıştır.
 
-### Success example
+### Başarılı örnek
 
-The first test demonstrates the behavior of using both ways of consuming an interation, the `for-await-of` syntax implemented in `alice()`, and the `observeIteration` adaptor implemented in `bob()`:
+İlk test, bir interation'ı tüketme iki yolun davranışını gösterir; `alice()` içinde uygulanan `for-await-of` sözdizimi ve `bob()` içinde uygulanan `observeIteration` adaptörü:
 
 ```js
 test("subscription for-await-of success example", async (t) => {
@@ -251,13 +251,13 @@ test("subscription observeIteration success example", async (t) => {
 });
 ```
 
-As described previously, when using the for-await-of approach, the value of the `finished` status is not returned, unlike the observeIteration that returns the value `done`.
+Daha önce belirtildiği gibi, for-await-of yaklaşımı kullanıldığında, `finished` durumunun değeri döndürülmez, observeIteration ise `done` değerini döndürür.
 
-### Promise example
+### Promise örneği
 
-At this test, instead of passing the `subscription`, which is an `AsyncIterable` object, to alice and bob, we are passing a `promise`.
-Notice that alice receives as a parameter ` @param {AsyncIterable<Passable>} asyncIterable` while bob receives a `@param {ERef<AsyncIterable<Passable>>} asyncIterableP`.
-This means that alice's code will fail when trying to iterate through the Promise, while bob will succeed.
+Bu testte, alice ve bob'a `subscription`, yani bir `AsyncIterable` nesnesi yerine bir `promise` geçiriyoruz.
+Dikkat edin ki, alice bir parametre olarak `{AsyncIterable<Passable>} asyncIterable` alırken, bob `{ERef<AsyncIterable<Passable>>} asyncIterableP` alır.
+Bu, Promise üzerinden yinelemeye çalışırken alice'in kodunun hata vereceği, bob'un ise başarılı olacağı anlamına gelir.
 
 ```js
 test("subscription for-await-of cannot eat promise", async (t) => {
@@ -288,15 +288,15 @@ test("subscription observeIteration can eat promise", async (t) => {
 });
 ```
 
-### Local representative example
+### Yerel temsilci örneği
 
-For this test, we need to understand the purpose of:
+Bu test için, aşağıdaki kod parçasının amacını anlamamız gerekiyor:
 
 ```js
 const localSub = makeSubscription(E(subP).getSharableSubscriptionInternals());
 ```
 
-This method is used to distribute a Notifier/Subscription efficiently over the network, by obtaining this from the Subscription to be replicated and applying `makeSubscription` to it at the new site to get an equivalent local Notifier at that site.
+Bu yöntem, bir Notifier/Subscription'ı ağı üzerinde etkili bir şekilde dağıtmak için kullanılır. Bunun için kopyalanacak Abonelikten bunu alır ve yeni siteye `makeSubscription`'ı uygular, bu da o siteye eşdeğer bir yerel Notifier getirir.
 
 ```js
 test("subscription for-await-of on local representative", async (t) => {
@@ -324,15 +324,15 @@ test("subscription observeIteration on local representative", async (t) => {
 });
 ```
 
-The results returned by alice and bob will have the same behavior as the first test since it receives as an argument an AsyncIterable object corresponding to the subscription instead of the promise `subP`. Solving the error returned by alice() on the previous test.
+Alice ve Bob tarafından döndürülen sonuçlar, ilk testle aynı davranışı gösterecektir çünkü parametre olarak Promise `subP` yerine aboneliği karşılayan bir AsyncIterable nesnesi alır. Bu, önceki testte alice() tarafından döndürülen hatayı çözer.
 
-Another way to convert a promise object of a notifier into an AsyncIterable is by using the method [makeAsyncIterableFromNotifier()](https://github.com/Agoric/agoric-sdk/blob/65d3f14c8102993168d2568eed5e6acbcba0c48a/packages/notifier/src/asyncIterableAdaptor.js#L37).
+Bir bildirici promise nesnesini AsyncIterable'a çevirmenin başka bir yolu, [makeAsyncIterableFromNotifier()](https://github.com/Agoric/agoric-sdk/blob/65d3f14c8102993168d2568eed5e6acbcba0c48a/packages/notifier/src/asyncIterableAdaptor.js#L37) metodunu kullanmaktır.
 
-### Generic representative example
+### Genel temsil örneği
 
-For this test, we need to understand the purpose of the `observeIteration()`.
-As we can see from the tests below, this function receives as a parameter a promise object of the subscription and an iterationObserver which will be the updater of the newly created notifierKit().
-The objective of observeIteration() is to filter by the different methods called on the subscription Promise.
+Bu test için, `observeIteration()`'ın amacını anlamamız gerekiyor.
+Aşağıdaki testlerden görebileceğimiz gibi, bu fonksiyon bir abonelik promise nesnesini ve yeni oluşturulan notifierKit()'in güncelleyicisi olacak bir iterationObserver parametre olarak alır.
+`observeIteration()`'ın amacı, abonelik Promise üzerinde çağrılan farklı metodları filtrelemektir.
 
 ```js
 /**
@@ -380,12 +380,11 @@ test("subscription observeIteration on generic representative", async (t) => {
 });
 ```
 
-The results returned by alice and bob will have the same behavior as the first test since it receives as an argument an AsyncIterable object corresponding to the subscription.
+Alice ve Bob tarafından döndürülen sonuçlar, aboneliği temsil eden AsyncIterable bir nesneyi argüman olarak aldığı için ilk testle aynı davranışı gösterecektir.
 
-### SubscriptionIterator example
+### SubscriptionIterator örneği
 
-This test implements the observeIterator method described on sub-chapter [ObserveIterator adaptor](#observeiterator-adaptor).
-Passing as argument the AsyncIterable subscription object.
+Bu test, AsyncIterable abonelik nesnesini argüman olarak geçirerek [ObserveIterator adaptör](#observeiterator-adaptor) alt bölümünde tanımlanan observeIterator metodunu uygular.
 
 ```js
 // /////////////////////////////////////////////////////////////////////////////
@@ -413,9 +412,9 @@ test("subscribe to subscriptionIterator success example", async (t) => {
 
 ## makeSubscriptionKit vs makePublishKit
 
-While exploring the `agoric-sdk`, we can notice something called `publishKit` but it isn't used in any smart contract that we could find. This seems like a minor detail but still, it might get confusing. So we'll talk about that briefly.
+`agoric-sdk`yı keşfederken `publishKit` adlı bir şeyi fark edebiliriz, ancak bunun herhangi bir akıllı sözleşmede kullanılmadığını görürüz. Bu küçük bir detay gibi görünebilir ancak yine de kafa karıştırabilir. Bu yüzden kısaca bundan bahsedeceğiz.
 
-Let's take a look at `makeSubscriptionKit`'s implementation:
+`makeSubscriptionKit`'in uygulamasına bir göz atalım:
 
 ```js
 const makeSubscriptionKit = () => {
@@ -438,7 +437,7 @@ const makeSubscriptionKit = () => {
 };
 ```
 
-As you can see, on the first line of the method body, there's `makePublishKit` creating `publisher` and the `base subscriber`. We use the term `base subscriber` because in the lines below, that subscriber we fetched from publishKit is wrapped around some methods that enable it to be consumed by iterating over its values and also complements the `prefix lossy` nature of the publishKit.
+Gördüğünüz gibi, metodun ilk satırında `makePublishKit` `publisher` ve `base subscriber` oluşturur. `base subscriber` terimini kullanıyoruz çünkü aşağıdaki satırlarda, publishKit'ten alınan bu abone, değerlerinin üzerinden yinelemeli olarak tüketilmesine ve publishKit'in `prefix lossy` doğasını tamamlamasına izin veren bazı metotlarla sarılır.
 
 ```js
 const pubList = subscriber.subscribeAfter();
@@ -447,9 +446,9 @@ const subscription = makeSubscription(pubList);
 
 ## makeNotifierKit vs makeSubscriptionKit
 
-The `makeNotifierKit` tests will show the same behavior as the `makeSubscriptionKit`, except for the returning values. As explained before, when using the makeNotifierKit, its lossy nature will make it return only the last updated value.
+`makeNotifierKit` testleri, dönen değerler dışında `makeSubscriptionKit` ile aynı davranışı gösterecektir. Daha önce açıkladığımız gibi, makeNotifierKit'i kullanırken, onun kayıp değerlere karşı hassas doğası, yalnızca son güncellenen değeri döndürmesine neden olacaktır.
 
-Using as an example the first test of the makeSubscriptionKit, here it is the correspondent one using makeNotifierKit.
+makeSubscriptionKit'in ilk testini örnek olarak kullanarak, işte makeNotifierKit'i kullanarak yapılan karşılık gelen test.
 
 ```js
 test("notifier for-await-of success example", async (t) => {
@@ -469,12 +468,12 @@ test("notifier observeIteration success example", async (t) => {
 });
 ```
 
-As we can see, the returned log is missing the non-final values `['non-final', 'a'] ['non-final', 'b']`.
+Görebileceğimiz gibi, dönen log `['non-final', 'a'] ['non-final', 'b']` olmayan final değerlerini içermiyor.
 
-## User Interface (UI)
+## Kullanıcı Arayüzü (UI)
 
-The notifier package is extremely useful to extract data from the blockchain to be presented in the `user interface`.
-Let's analyze the code below, from the [dapp-card-store UI](https://github.com/Agoric/dapp-card-store/blob/main/ui/src/App.js).
+Notifier paketi, blockchain'den verileri çıkararak `kullanıcı arayüzünde` sunmak için son derece faydalıdır.
+Aşağıdaki kodu inceleyelim, [dapp-card-store UI](https://github.com/Agoric/dapp-card-store/blob/main/ui/src/App.js)'dan.
 
 ```js
 import { makeAsyncIterableFromNotifier as iterateNotifier } from '@agoric/notifier';
@@ -503,41 +502,41 @@ export default App;
 
 ```
 
-The method `makeAsyncIterableFromNotifier()` creates a local notifier object, as described in the sub-chapter [Local representative example](#local-representative-example). In this example, the developer fetched the `availableItemsNotifier` from the contract public facet, using the makeAsyncIterableFromNotifier to create the local notifier `cardsAvailableAmount`, and passed it as an argument to setAvailableCards to display the information on the graphical interface.
+`makeAsyncIterableFromNotifier()` metodu, [Local representative example](#local-representative-example) alt bölümünde açıklandığı gibi yerel bir bildirimci nesnesi oluşturur. Bu örnekte, geliştirici sözleşmenin kamuya açık yüzeyinden `availableItemsNotifier`'ı alır, makeAsyncIterableFromNotifier kullanarak yerel bildirimci `cardsAvailableAmount`'ı oluşturur ve bu bilgiyi grafiksel arayüzde göstermek için setAvailableCards'a argüman olarak geçer.
 
-`Note: no UI examples using getSharableSubscriptionInternals() were found on the agoric organization repo`
+`Not: agoric organization repo'sunda getSharableSubscriptionInternals() kullanılan UI örnekleri bulunamadı`
 
-## Storing Subscriber Data
+## Abone Verilerini Saklama
 
-Is it free-read data from Agoric? Unfortunately, as presently constructed, the answer to this question is no.
-In Agoric, the main way for receiving updates from blockchain is to use `Notifiers` and `Subscribers`.
+Agoric'ten veri okumak ücretsiz mi? Maalesef, şu anki yapıya göre, bu sorunun yanıtı hayır.
+Agoric'te, blockchain'den güncellemeler almanın ana yolu `Notifier` ve `Subscriber` kullanmaktır.
 
-For a notifier,
+Bir notifier için,
 
 ```js
 E(notifier).getUpdateSince();
 ```
 
-For a subscriber,
+Bir abone için,
 
 ```js
 subscriberIterator = subscriber[Symbol.asyncIterator]();
 E(subscriberIterator).next();
 ```
 
-Since both of these operations invoke methods on objects that are living on the blockchain, they cost gas fee. Agoric team realizes that to host large-scale applications in the ecosystem, they need to come up with a solution to this problem.
+Her iki işlem de blockchain'de yaşayan nesnelerin yöntemlerini çağırdığı için, bu işlemler gaz ücreti gerektirir. Agoric ekibi, ekosistemdeki büyük ölçekli uygulamaları barındırmak için bu soruna bir çözüm bulmaları gerektiğini fark etti.
 
-### Enter vat-chainStorage
+### İşte vat-chainStorage
 
-As a solution to this, the Agoric team designed a separate `static vat` that will serve as a key-value store.
-The write access is limited to only other system-level components that have appropriate powers such as `inter-protocol`.
-On the other hand read access is public. Anybody who knows the key to a `storageNode` can read the data for free.
-It's an ongoing effort to make such a `vat` available to all third-party dapp developers.
+Buna çözüm olarak, Agoric ekibi, anahtar-değer mağazası olarak hizmet verecek ayrı bir `static vat` tasarladı.
+Yazma erişimi, yalnızca `inter-protocol` gibi uygun yeteneklere sahip diğer sistem düzeyi bileşenlerle sınırlıdır.
+Öte yandan, okuma erişimi herkese açıktır. Bir `storageNode`'un anahtarını bilen herkes verileri ücretsiz olarak okuyabilir.
+Bu tür bir `vat`ın tüm üçüncü taraf dapp geliştiricilere kullanılabilir hale getirilmesi için devam eden bir çaba var.
 
-> Recall a `static-vat` is a type of vat that is started during the bootstrap and hosts a system component.
+> Bir `static-vat`ın, bootstrap sırasında başlatılan ve bir sistem bileşenini barındıran bir vat türü olduğunu hatırlayın.
 
-Below is a diagram that illustrates how a normal `{ publisher, subscriber }` pair can be used to write to make us of
-`vat-chainStorage`.
+Aşağıdaki diyagram, normal bir `{ publisher, subscriber }` çiftinin nasıl kullanılacağını göstermektedir.
+`vat-chainStorage` kullanımını yapmak için.
 
 ```mermaid
 sequenceDiagram
@@ -553,5 +552,5 @@ sequenceDiagram
     S -->>- Client: { Data }
 ```
 
-There are mechanisms implemented for wrapping subscribers.
-You can check them out in [storesub.js](https://github.com/Agoric/agoric-sdk/blob/65d3f14c8102993168d2568eed5e6acbcba0c48a/packages/notifier/src/storesub.js)
+Aboneleri sarmak için uygulanan mekanizmalar vardır.
+Bu mekanizmaları [storesub.js](https://github.com/Agoric/agoric-sdk/blob/65d3f14c8102993168d2568eed5e6acbcba0c48a/packages/notifier/src/storesub.js) adresinde kontrol edebilirsiniz.
