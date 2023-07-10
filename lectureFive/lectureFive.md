@@ -467,49 +467,48 @@ Ve liste böyle devam eder. Tam belgelendirme için [ERTP API Referansı'nı](ht
 * `E(home.wallet).getPurses()`
 * `E(home.wallet).getPurse(petname)`
   
-> Note: [Definition of Petname](https://docs.agoric.com/glossary/#petname)
+> Not: [Petname'nin tanımı](https://docs.agoric.com/glossary/#petname)
 
-See [Wallet API Reference](https://docs.agoric.com/reference/wallet-api.html#wallet-api-commands) for full list of 
-methods.
+Tüm yöntemlerin tam listesi için [Cüzdan API Referansı](https://docs.agoric.com/reference/wallet-api.html#wallet-api-commands)'na bakınız.
 
-Let's try to send this desired offer from a deploy script using `home.wallet` object;
+`home.wallet` objesini kullanarak bu istenen teklifi bir dağıtım script'inden göndermeyi deneyelim;
 
 ```js
 /**
- * We assume;
- * - All board ids are already known
- * - All petnames are known
+ * Şunu varsayıyoruz;
+ * - Tüm tahta id'leri zaten bilinmektedir
+ * - Tüm petname'ler bilinmektedir
  */
 const sendOfferUsingWalletAPI = async homeP => {
   const { zoe, board, wallet } = E.get(homeP);
-  const quatloosPursePetname = 'Quatloos Purse';
-  const moolaPursePetname = 'Moola Purse';
+  const quatloosPursePetname = 'Quatloos Cüzdanı';
+  const moolaPursePetname = 'Moola Cüzdanı';
   
-  // Get values from board
+  // Değerleri tahtadan al
   const [
-    quatloosBrand,
-    moolaBrand,
-    publicFacet, // Public Facet of imaginary contract that is going to do the trade
+    quatloosMarka,
+    moolaMarka,
+    publicFacet, // Ticareti yapacak hayali sözleşmenin Kamu Yüzü
   ] = await Promise.all([
     E(board).getValue(QUATLOOS_BRAND_BOARD_ID),
     E(board).getValue(MOOLA_BRAND_BOARD_ID),
     E(board).getValue(PUBLIC_FACET_BOARD_ID),
   ]);
   
-  // Build offer
-  const quatloosAmount = AmountMath.make(quatloosBrand, 100n);
-  const moolaAmount = AmountMath.make(moolaBrand, 200n);
+  // Teklifi oluştur
+  const quatloosAmount = AmountMath.make(quatloosMarka, 100n);
+  const moolaAmount = AmountMath.make(moolaMarka, 200n);
   
   const proposal = harden({
     give: { Price: quatloosAmount },
     want: { Asset: moolaAmount }
   });
   
-  // Get purses
+  // Cüzdanları al
   const quatloosPurseP = E(wallet).getPurse(quatloosPursePetname);
   const moolaPurseP = E(wallet).getPurse(moolaPursePetname);
   
-  // Get payment
+  // Ödemeyi al
   const quatloosPayment = await E(quatloosPurseP).withdraw(quatloosAmount);
   
   const payment = harden({
@@ -522,74 +521,67 @@ const sendOfferUsingWalletAPI = async homeP => {
     payment
   );
   
-  // Make sure offer is successful, this will throw if there was an uncatched error when executing the offer
+  // Teklifin başarılı olduğundan emin ol, bu teklifin gerçekleştirilmesinde yakalanmayan bir hata olduğunda hata verir
   await E(userSeat).getOfferResult();
   
-  // Get payout
+  // Ödemeyi al
   const moolaPayment = await E(userSeat).getPayout('Asset');
   
-  // Put moola into purse
+  // Moolayı cüzdana koy
   await E(moolaPurseP).deposit(moolaPayment);
 };
 
 export default sendOfferUsingWalletAPI;
 ```
 
-Let's break down the above code step-by-step;
-1. We fetch references to the required objects from the `board`
-2. We create the proposal with `Amounts`
-3. We fetch purses to the desired assets from our wallet
-4. We withdraw from `quatloosPurse` the amount of `quatloos` we specified in our `give` section of the proposal
-5. We build the payment
-6. We send the offer
-7. Check everything went alright
-8. Withdraw what we wanted from the `userSeat`
-9. Deposit the withdrawn `moola` to the `moolaPurseP`
+Yukarıdaki kodu adım adım açıklayalım;
+1. Gerekli objelere `tahta`dan referansları alıyoruz
+2. `Amounts` ile teklifi oluşturuyoruz
+3. Cüzdanımızdan istenen varlıklara ilişkin cüzdanları alıyoruz
+4. Teklifimizin `give` kısmında belirttiğimiz `quatloos` miktarını `quatloosCüzdanı`ndan çekiyoruz
+5. Ödemeyi oluşturuyoruz
+6. Teklifi gönderiyoruz
+7. Her şeyin yolunda gittiğini kontrol ediyoruz
+8. İstediğimizi `userSeat`ten çekiyoruz
+9. Çekilen `moola`yı `moolaCüzdanı`na yatırıyoruz
 
-Can you sense some anti-pattern in the above code? What happened to the "No developers should get their hands on 
-to any payment in the code"? Yeah, something's wrong here. Although this might be a useful approach for demos, this
-is not a production approach. So what is the solution then?
+Yukarıdaki koddaki bir anti-paterni fark edebiliyor musunuz? "Hiçbir geliştiricinin kodda herhangi bir ödeme üzerinde kontrolü olmamalı" ne oldu? Evet, burada bir şeyler yanlış. Bu, demo'lar için yararlı bir yaklaşım olabilir, ancak bu bir üretim yaklaşımı değil. Peki çözüm ne?
 
-**Enter `walletBridge`**
+**`walletBridge`'e hoş geldiniz**
 
-`walletBridge` provides an API for untrusted dapps to let them interact with the wallet and therefore, the assets
-in the wallet. See [WalletBridge API Reference](https://docs.agoric.com/reference/wallet-api.html#walletbridge-api-commands)
-for full list of available methods. 
+`walletBridge`, güvenilmeyen dapp'ların cüzdanla ve dolayısıyla cüzdanındaki varlıklarla etkileşime girmelerine izin veren bir API sağlar. Kullanılabilir tüm yöntemlerin tam listesi için [WalletBridge API Referansı](https://docs.agoric.com/reference/wallet-api.html#walletbridge-api-commands)'na bakınız.
 
-In Web3, almost every dapp asks for user to connect their wallet. In Agoric, this is also the case. Dapps ask for
-approval from users so that they can do their job. Approving a dapp means;
-* A `walletBridge` instance specific to that dapp is created and returned to the dapp
-* User's wallet now knows that dapp
+Web3'te, hemen hemen her dapp, kullanıcının cüzdanını bağlamasını ister. Agoric'te durum aynıdır. Dapp'lar, işlerini yapabilmeleri için kullanıcılardan onay ister. Bir dapp'ı onaylamak demek;
+* O dapp için özel bir `walletBridge` örneği oluşturulur ve dapp'a geri döndürülür
+* Kullanıcının cüzdanı artık dapp'ı tanıyor
 
-The term `bridge` is used because it sits between the full features of `home.wallet` and the dapp. Every offer
-sent via `walletBrdige` is subject to user approval. These offer requests show up on the Wallet UI's `Dashboard`.
-The end-to-end flow can be seen in the below diagram:
+`bridge` terimi, `home.wallet`'ın tüm özellikleri ve dapp arasında olduğu için kullanılır. `walletBridge` üzerinden gönderilen her teklif kullanıcının onayına tabidir. Bu teklif istekleri, Cüzdan UI'nın `Dashboard`'unda görünür. Uçtan uca akış, aşağıdaki diyagramda görülebilir:
 
 ```mermaid
 sequenceDiagram
-   actor User
+   actor Kullanıcı
    participant CU as Dapp
-   participant W as Wallet
-   User->>CU: Opens the dapp page
-   CU->>+W: Tries to connect to ag-solo
-   W ->>+ User: Asks for user approval
-   User->>-W: Approves the dapp
-   W-->>-CU: Returns a WalletBridge object
+   participant W as Cüzdan
+   Kullanıcı->>CU: Dapp sayfasını açar
+   CU->>+W: Ag-solo'ya bağlanmaya çalışır
+   W ->>+ Kullanıcı: Kullanıcı onayı ister
+   Kullanıcı->>-W: Dapp'ı onaylar
+   W-->>-CU: Bir WalletBridge nesnesi döndürür
    CU->>+W: E(walletBridge).addOffer(offerConfig)
-   W ->>+ User: Asks for user approval
-   User->>-W: Approves the offer
-   W -->>-CU: Returns offerID
+   W ->>+ Kullanıcı: Kullanıcı onayı ister
+   Kullanıcı->>-W: Teklifi onaylar
+   W -->>-CU: TeklifID'yi döndürür
 ```
 
-Now, let's try to update the anti-pattern code into a safe CLI client to our wallet:
+
 
 ```js
 /**
- * We assume;
- * - All board ids are already known
- * - All petnames are known
+ * Şunu varsayıyoruz;
+ * - Tüm board id'leri zaten biliniyor
+ * - Tüm petname'ler biliniyor
  */
-const safeOfferClient = async homeP => {
+const guvenliTeklifMusterisi = async homeP => {
   const { board, wallet } = E.get(homeP);
   const quatloosPursePetname = 'Quatloos Purse';
   const moolaPursePetname = 'Moola Purse';
@@ -597,7 +589,7 @@ const safeOfferClient = async homeP => {
   const publicFacetP = E(board).getValue(PUBLIC_FACET_BOARD_ID);
   const walletBridge = E(wallet).getBridge();
   
-  const offerConfig = {
+  const teklifKonfigurasyonu = {
     id: `${Date.now()}`,
     invitation: E(publicFacetP).makeBorrowInvitation(),
     installationHandleBoardId: IMAGINARY_CONTRACT_INSTALL_BOARD_ID,
@@ -618,62 +610,52 @@ const safeOfferClient = async homeP => {
     },
   };
   
-  await E(walletBridge).addOffer(offerConfig);
-  console.log('Offer sent.');
+  await E(walletBridge).addOffer(teklifKonfigurasyonu);
+  console.log('Teklif gönderildi.');
 };
 
-export default safeOfferClient;
+export default guvenliTeklifMusterisi;
 ```
 
-Once we execute this script with `agoric deploy`, the code above will send the exact offer as we sent in the 
-earlier sample. Notice;
-* There are not `payments` flying around
-* OfferHandler will be executed after the user approves offer request from Wallet UI
+Bu scripti `agoric deploy` ile çalıştırdığımızda, yukarıdaki kod daha önceki örnekte gönderdiğimiz teklifi aynen gönderir. Fark edin;
+* Herhangi bir `payment` uçuşmuyor
+* OfferHandler, kullanıcının Wallet UI'dan teklif isteğini onaylamasının ardından çalıştırılacak
 
-One more important thing to mention:
+Belirtilecek bir şey daha var:
 
 ```js
 const walletBridge = E(wallet).getBridge();
 ```
 
-In the above line, we fetched the `walletBridge` using `getBridge` method. In the documentation, you'll also see a
-`getScopedBridge` method which is what a dapp will use in a real world scenario. The difference between `getBridge` 
-and `getScopedBridge` is that `E(wallet).getScopedBridge()` requires a user approval whereas
-`E(wallet).getBridge()` does not. Since deploy scripts are considered trusted agents we were able to use 
-`getBridge`, if we were a dapp living in a browser, and try to fetch a `walletBridge` instance from the wallet
-we would have to use `getScopedBridge` instead.
+Yukarıdaki satırda, `getBridge` metodunu kullanarak `walletBridge`'i çektik. Belgelerde, gerçek dünya senaryosunda bir dapp'ın kullanacağı `getScopedBridge` adlı bir metodun da olduğunu göreceksiniz. `getBridge` ile `getScopedBridge` arasındaki fark, `E(wallet).getScopedBridge()`'in kullanıcı onayı gerektirmesi, `E(wallet).getBridge()`'in ise gerektirmemesidir. Dağıtım scriptlerinin güvenilir ajanlar olarak kabul edildiği için `getBridge`'i kullanabildik, eğer bir tarayıcıda yaşayan bir dapp olsaydık ve cüzdanımızdan bir `walletBridge` örneği almaya çalışırsak, bunun yerine `getScopedBridge`'i kullanmak zorunda kalırdık.
 
-**Deploy Scitps Can Mimic Client Apps**
-With the usage of `wallet` you can test your contracts in a non-unit-test-environment without building a GUI.
-A very useful feature for demos.
+**Dağıtım Scriptleri Müşteri Uygulamalarını Taklit Edebilir**
+`wallet` kullanımıyla, bir GUI oluşturmadan kontratlarınızı bir birim-test-olmayan-ortamda test edebilirsiniz. Demolar için çok kullanışlı bir özellik.
 
-### Timers: `localTimerService` vs `chainTimerService`?
-Agoric offers a shared time service across all agents of the network. Any parties doing a business that depends on time
-can use this service to make sure all time passes the same for everybody. 
+### Zamanlayıcılar: `localTimerService` mi `chainTimerService` mi?
+Agoric, ağın tüm ajanları arasında paylaşılan bir zaman hizmeti sunar. Zamanın geçişine bağlı bir iş yapan tüm taraflar, herkes için zamanın aynı şekilde geçtiğinden emin olmak için bu hizmeti kullanabilir.
 
-This shared time service is called `chainTimerService`. Agoric also offers a `localTimerService` which is mainly used
-for tests. These timer services both share an identical API. The only difference between them is the _unit of time_:
+Bu paylaşılan zaman hizmeti `chainTimerService` olarak adlandırılır. Agoric ayrıca çoğunlukla testler için kullanılan `localTimerService`'i sunar. Bu zaman hizmetleri her ikisi de aynı API'yi paylaşır. Aralarındaki tek fark _zaman birimidir_:
 
-* `localTimerService` interprets time **milliseconds**.
-* `chainTimerService` interprets time **seconds**.
+* `localTimerService` zamanı **milisaniye** cinsinden yorumlar.
+* `chainTimerService` zamanı **saniye** cinsinden yorumlar.
 
-[See the full docs on timer services.](https://docs.agoric.com/reference/repl/timerServices.html#timerservice-objects)
+[Zaman hizmetleri üzerine tam belgelere buradan bakabilirsiniz.](https://docs.agoric.com/reference/repl/timerServices.html#timerservice-objects)
 
-When you're developing a smart contract that depends on time, the usual way to go is to accept a `timer` from the 
-contract terms:
+Zaman bağımlılığı olan bir akıllı kontrat geliştirirken, genellikle yapılacak yol, kontrat koşullarından bir `timer` kabul etmektir:
 
 ```js
-const start = async zcf => {
+const basla = async zcf => {
   const {
     timer,
   } = zcf.getTerms();
 };
 
-harden(start);
-export { start };
+harden(basla);
+export { basla };
 ```
 
-And in your deploy script you can inject any timer service as you like to your contract:
+Ve dağıtım scriptinizde istediğiniz zaman hizmetini kontratınıza enjekte edebilirsiniz:
 
 ```js
 const deploy = async homeP => {
@@ -703,13 +685,11 @@ const deploy = async homeP => {
 export default deploy;
 ```
 
-Both terms are valid and can be used by your contract.
+Her iki terim de geçerlidir ve kontratınız tarafından kullanılabilir.
 
-There's a [manualTimer](https://github.com/Agoric/agoric-sdk/blob/65d3f14c8102993168d2568eed5e6acbcba0c48a/packages/zoe/tools/manualTimer.js)
-that is very useful for testing as well. Make sure to check this out.
+Çok kullanışlı olan bir [manualTimer](https://github.com/Agoric/agoric-sdk/blob/65d3f14c8102993168d2568eed5e6acbcba0c48a/packages/zoe/tools/manualTimer.js) var. Bunu kontrol ettiğinizden emin olun.
 
+## Demo Zamanı!
+* CLI Müşterisi olarak Dağıtım Scripti
+* Diğer kullanıcılara özel davetiyeler gönderme
 
-
-## Demo Time!
-* Deploy Script as a CLI Client
-* Sending invitation to other users privately 
