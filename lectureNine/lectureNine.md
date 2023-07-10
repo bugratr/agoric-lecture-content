@@ -1,141 +1,130 @@
-# Lecture Nine - The Inter Protocol
-## Table of Contents
-* Introduction
-  * How does IST maintain its stability?
-* Interacting with The Inter Protocol
-  * Smart Wallet
-* IST Minting Components
+# Dokuzuncu Ders - Inter Protokol
+## İçindekiler
+* Giriş
+  * IST nasıl stabilitesini korur?
+* Inter Protokol ile Etkileşim
+  * Akıllı Cüzdan
+* IST Basma Bileşenleri
   * PSM
   * VaultFactory
   * BLD Boost
-* Liquidity Safeguards
+* Likidite Güvenceleri
   * AMM
-  * Reserve
+  * Rezerv
 
-## Introduction
-Agoric aims to position itself in a unique place across all Cosmos ecosystem. The plan is to introduce Inter Stable Token
-(IST) which is a native IBC compatible token soft-pegged to the US dollar. The Inter Protocol is a decentralized application
-that implements the Agoric Economy around IST.
+## Giriş
+Agoric, kendini Cosmos ekosisteminin tamamında eşsiz bir yere konumlandırmayı hedefliyor. Plan, ABD dolarına yumuşak bir şekilde bağlı, yerel IBC uyumlu token olan Inter Stable Token (IST) sunmaktır. Inter Protokol, IST çevresinde Agoric Ekonomisini uygulayan merkeziyetsiz bir uygulamadır.
 
-### How it works?
-The Inter Protocol is a root term for multiple applications. Below diagram illustrates how these applications work together
-to handle minting/burning of IST. 
+### Nasıl çalışır?
+Inter Protokol, birden fazla uygulama için temel bir terimdir. Aşağıdaki diyagram, bu uygulamaların IST'nin basılması/yakılması işlemini nasıl birlikte gerçekleştirdiğini göstermektedir.
 
 <img src='https://lh5.googleusercontent.com/wnaZXiSS3cuWBmtbACyv5aw6DeqUepZ_eP3G2Pgp75oxj7balatvemuImSAv0Yv7nzAwnQduygirTVIiMOZL5FGzm9jx1Uuq1OaUDET5EFmLT3lNzBM_IMNRXjqJnX-aDybtqr-bpqrx3itGVy0pJg' width='60%' >
 
-> _Figure 1: [The Inter Protocol System Overview](https://docs.inter.trade/inter-protocol-system-documentation/inter-protocol-system-overview)_
+> _Şekil 1: [Inter Protokol Sistem Genel Bakış](https://docs.inter.trade/inter-protocol-system-documentation/inter-protocol-system-overview)_
 
-The Inter Protocol is currently live on `Mainnet 1` which has `PSM` and `Smart Wallet` from the diagram only. 
-Checkout [Agoric Roadmap](https://agoric.com/roadmap/) for future launches. Current version of [The Inter Protocol](https://inter.trade/)
-enables users to trade stable tokens against IST in `PSM` using `Smart Wallet` and [Keplr](https://www.keplr.app/).
+Inter Protokol şu anda sadece diyagramdaki `PSM` ve `Akıllı Cüzdan` ile `Mainnet 1` üzerinde canlıdır. 
+Gelecek lansmanlar için [Agoric Yol Haritası](https://agoric.com/roadmap/)'na göz atın. [Inter Protokol](https://inter.trade/)
+'ün şu anki sürümü, kullanıcıların `PSM` içinde IST'ye karşı stable token alıp satmasına olanak sağlar. Bu işlem `Akıllı Cüzdan` ve [Keplr](https://www.keplr.app/) kullanılarak gerçekleştirilir.
 
-Agoric adopts a model that is similar to [Maker DAO](https://makerdao.com/en/). This makes IST fully collateralized by 
-crypto assets. Thus, fully decentralized. The collateralization strategy is like most of the protocols crypto world, 
-meaning overcollateralized. `Liquidation Margin` is a parameter that helps to calculate how much bigger the US Dollar
-value of the collateral should be compared to the requested IST.
+Agoric, modelini [Maker DAO](https://makerdao.com/en/)'ya benzer bir şekilde benimser. Bu, IST'nin kripto varlıklarla tamamen teminatlandırıldığı anlamına gelir. Dolayısıyla, tamamen merkeziyetsizdir. Teminatlandırma stratejisi, çoğu protokolün kripto dünyasındaki gibi, yani aşırı teminatlandırılmıştır. `Likidasyon Marjı`, istenen IST'ye kıyasla teminatın ABD Doları değerinin ne kadar büyük olması gerektiğini hesaplamaya yardımcı olan bir parametredir.
 
-`Economic Committee` is governance parameters that are crucial to Agoric Economy. These parameters include
-* Debt Limits
-* Interest Rates
-* Collateralization Ratio
+`Ekonomik Komite`, Agoric Ekonomisi için kritik öneme sahip yönetim parametreleridir. Bu parametreler şunları içerir:
+* Borç Limitleri
+* Faiz Oranları
+* Teminatlandırma Oranı
 
-And so on...
+Ve benzeri...
 
-Who gets to be in the `Economic Committee`? Well that depends. The members of the `Ecomomic Committee` are elected by 
-`BLDer DAO`. `BLDer DAO` is an umbrella term that represents `BLD` stake holders. The code for this `Economic Committee`
-can be found in [committee.js](https://github.com/Agoric/agoric-sdk/blob/master/packages/governance/src/committee.js) which
-is maintained under `governance` package.
+`Ekonomik Komite`ye kimler girer? İşte bu bağlıdır. `Ekonomik Komite`nin üyeleri `BLDer DAO` tarafından seçilir. `BLDer DAO`, `BLD` pay sahiplerini temsil eden bir genel terimdir. Bu `Ekonomik Komite`nin kodu, `governance` paketi altında bakımı yapılan [committee.js](https://github.com/Agoric/agoric-sdk/blob/master/packages/governance/src/committee.js) dosyasında bulunabilir.
 
-> Do not forget to check out [The Inter Protocol White Paper](https://inter.trade/static/whitepaper-6106f841c1ed6c564afd2fc3238240a9.pdf)
-> for more information.
+> Unutmayın, daha fazla bilgi için [Inter Protokol Beyaz Kağıdı](https://inter.trade/static/whitepaper-6106f841c1ed6c564afd2fc3238240a9.pdf)
+> 'na göz atın.
 
-### How does IST maintain its stability?
+### IST nasıl stabilitesini korur?
 
-**What is a `Stable Token`?**
+**`Stable Token` nedir?**
 
-**Types of `Stable Token`s**
+**`Stable Token` Tipleri**
 
-**Maintaining Stability**
+**Stabiliteyi Koruma**
 
-## Interacting with The Inter Protocol
-### Smart Wallet
-If you check the _Figure 1_ you can see that `Smart Wallet` is the gateway of users to the `inter-protocol` dapps.
-But until now we always interacted with Agoric Network using `ag-solo`, why `Smart Wallet` then? Notice that 
-`ag-solo` is an off-chain `vat` that has access to the very powerful objects like `wallet`, `network` etc. 
-Thus, the motivation for `Smart Wallet` can be listed as;
+## Inter Protokol ile Etkileşim
+### Akıllı Cüzdan
+Eğer _Şekil 1_'e bakarsanız, `Akıllı Cüzdan`ın kullanıcıların `inter-protokol` dapp'lerine giriş kapısı olduğunu görebilirsiniz.
+Ama şimdiye kadar Agoric Ağı ile hep `ag-solo` kullanarak etkileşime girdik, neden `Akıllı Cüzdan` o zaman? Fark edin ki 
+`ag-solo` çok güçlü nesnelere erişimi olan off-chain bir `vat`'tır. 
+Dolayısıyla, `Akıllı Cüzdan` için motivasyonlar şunlar olabilir;
 
-* We should not expose objects that powerful to normal users
-* Not every user can run their own `ag-solo` in order to interact with Agoric Blockchain
+* Bu kadar güçlü nesneleri normal kullanıcılara maruz bırakmamalıyız
+* Her kullanıcı, Agoric Blockchain'le etkileşime girmek için kendi `ag-solo`'sunu çalıştıramaz
 
-> Note: `ag-solo` is still usable in DevNet but for `MainNet` you have to use `Smart Wallet`
+> Not: `ag-solo` DevNet'te hala kullanılabilir ama `MainNet` için `Akıllı Cüzdan` kullanmalısınız
 
-Below diagram compares `Smart Walet` approach to the existing `ag-solo` approach
+Aşağıdaki diyagram, `Akıllı Cüzdan` yaklaşımını mevcut `ag-solo` yaklaşımıyla karşılaştırır
 
 <img src="images/smart-wallet-ag-solo.png" width='40%'>
 
-> _Figure 2: SmartWallet vs ag-solo. [Original Diagram.](https://github.com/Agoric/documentation/issues/726#issue-1442404880)_
+> _Şekil 2: SmartWallet vs ag-solo. [Orijinal Diyagram.](https://github.com/Agoric/documentation/issues/726#issue-1442404880)_
 
-A few things to note here;
+Burada not edilmesi gereken birkaç şey;
 
-* `SmartWallet` consists of two major components
-  * On-chain smart contracts and helper code
-  * Off-chain client code: `SmartWalletUI`
-    > [SmartWallet Contract Code](https://github.com/Agoric/agoric-sdk/tree/master/packages/smart-wallet) and [Smart Wallet UI Code](https://github.com/Agoric/wallet-app)
+* `Akıllı Cüzdan`, iki ana bileşenden oluşur
+  * On-chain akıllı sözleşmeler ve yardımcı kod
+  * Off-chain ist
 
-On-chain `SmartWallet Contracts` have the following major responsibilities;
-* Deal with user's balances via a special object called `bank`
-* Forward offer requests coming from dapps to the actual offerHandler
+emci kod: `SmartWalletUI`
+    > [Akıllı Cüzdan Sözleşme Kodu](https://github.com/Agoric/agoric-sdk/tree/master/packages/smart-wallet) ve [Akıllı Cüzdan UI Kodu](https://github.com/Agoric/wallet-app)
 
-> Check out [bank code](https://github.com/Agoric/agoric-sdk/blob/f41a6ce8975e5bf713734425189946e9d38d1f3f/packages/vats/src/vat-bank.js#L204) and [How does Smart-Wallet work?](https://github.com/Agoric/agoric-sdk/discussions/6934)
-> discussion to learn more.
+On-chain `Akıllı Cüzdan Sözleşmeleri`nin aşağıdaki ana sorumlulukları vardır;
+* `bank` adı verilen özel bir nesne aracılığıyla kullanıcının bakiyeleriyle ilgilenmek
+* Dapp'lardan gelen teklif taleplerini gerçek teklifHandler'a iletme
 
-The sequence diagram below illustrates the flow in _Figure 2_ with more detail:
+> Daha fazla öğrenmek için [bank kodu](https://github.com/Agoric/agoric-sdk/blob/f41a6ce8975e5bf713734425189946e9d38d1f3f/packages/vats/src/vat-bank.js#L204) ve [Akıllı Cüzdan nasıl çalışır?](https://github.com/Agoric/agoric-sdk/discussions/6934)
+> tartışmasına göz atın.
 
+Aşağıdaki sıralı diyagram, _Şekil 2_'deki akışı daha fazla detayla gösterir:
 ```mermaid
 sequenceDiagram
-    dApp ->> SmartWalletUI: Adds new offer
-    SmartWalletUI ->> SmartWalletUI: User approves offer
-    SmartWalletUI ->> Keplr: OfferConfig serialized into 'spendAction'
-    Keplr ->> Keplr: Signs transaction
-    Keplr ->> WalletFactory: Transaction sent to Agoric Chain
-    WalletFactory ->> WalletFactory: Find 'smartWallet' provisioned to the user
-    WalletFactory ->> User - SmartWallet: Forward transaction
-    User - SmartWallet ->> OfferHandler: Execute offer in the `spendAction` data
+    dApp ->> SmartWalletUI: Yeni teklif ekler
+    SmartWalletUI ->> SmartWalletUI: Kullanıcı teklifi onaylar
+    SmartWalletUI ->> Keplr: TeklifConfig 'spendAction' içerisine seri hale getirilir
+    Keplr ->> Keplr: İşlem imzalanır
+    Keplr ->> WalletFactory: İşlem Agoric Zincirine gönderilir
+    WalletFactory ->> WalletFactory: Kullanıcıya tahsis edilen 'smartWallet' bulunur
+    WalletFactory ->> User - SmartWallet: İşlemi ilet
+    User - SmartWallet ->> OfferHandler: `spendAction` verisindeki teklifi uygula
 ```
 
-As you can see the `On-chain SmartWallet Contracts` is broken down into two components;
+Gördüğünüz gibi `Zincir İçi Akıllı Cüzdan Sözleşmeleri` iki bileşene ayrılmıştır;
 1. WalletFactory
 2. SmartWallet
 
-The relationship between `WalletFactory` and `SmartWallet` can be observed below:
+`WalletFactory` ve `SmartWallet` arasındaki ilişki aşağıda gözlemlenebilir:
 
 <img src="images/lectureNine-smartWalletContracts.png" width='90%'>
 
-## IST Minting Components
+## IST Basma Bileşenleri
 
 ### PSM
-The Parity Stability Module(PSM) is similar to [The Peg Stability Module](https://mips.makerdao.com/mips/details/MIP29#sentence-summary)
-of MakerDAO. The basic idea is to mint IST against other stable coins in 1:1 ratio. BLD staker governance decides which 
-stablecoins are supported as collaterals. For a given instance of `PSM`, meaning a market that mints IST against a
-particular type of stablecoin, `Economic Commitee` also governs below parameters;
+Parity Stability Module (PSM), MakerDAO'nun [The Peg Stability Module](https://mips.makerdao.com/mips/details/MIP29#sentence-summary) 
+konseptine benzer. Temel fikir, diğer stabil paralar karşılığında 1:1 oranında IST basmaktır. BLD staker yönetimi, hangi 
+stabilcoinlerin teminat olarak kabul edileceğine karar verir. Belirli bir `PSM` örneği için, yani bir tür stabilcoin karşılığında IST basan bir piyasa için, `Ekonomi Komitesi` aşağıdaki parametreleri de yönetir;
  
 * GiveMintedFee
 * MintLimit
 * WantMintedFee
 
-These parameters are `Fees` when we give/want IST to/from `PSM` module, and the other one is the total amount of IST that this
-`PSM` instance can mint.
+Bu parametreler, `PSM` modülünden IST almak/vermek için `Ücretler`dir ve diğeri bu `PSM` örneğinin basabileceği IST toplam miktarıdır.
 
-#### Idea
-The idea behind `PSM` is to maintain IST's stability by presenting arbitrage opportunities whenever IST price diverges
-from US dollar. This arbitrage mechanism is illustrated in below;
+#### Fikir
+`PSM` arkasındaki fikir, IST fiyatı Amerikan dolarından saparsa arbitraj fırsatları sunarak IST'nin stabilitesini korumaktır. Bu arbitraj mekanizması aşağıda gösterilmiştir;
 
-> Numbers used in below diagram are chosen arbitrary
+> Aşağıdaki diyagramda kullanılan sayılar keyfi olarak seçilmiştir
 
 <img src='images/lectureNine-psm.png' width='40%'>
 
-#### For Developers
-To third party developers who might want to integrate their dapp to `PSM`, consider taking a look at the `PSM Public Facet`;
+#### Geliştiriciler için
+`PSM`'ye kendi dapp'lerini entegre etmek isteyen üçüncü taraf geliştiriciler, `PSM Public Facet`'e göz atmayı düşünebilir;
 
 ```js
 // PSM publicFacet
@@ -147,8 +136,7 @@ const publicFacet = {
   ...publicMixin,
 }
 ```
-Use `makeWantMintedInvitation` when you want IST against your stabletoken and use `makeGiveMintedInvitation` when
-you want your stablecoin against IST. The usage of these invitations is like what we've seen so far.
+Stabletoken'ınız karşılığında IST istediğinizde `makeWantMintedInvitation` kullanın ve IST'niz karşılığında stabletoken'ınızı istediğinizde `makeGiveMintedInvitation` kullanın. Bu davetiyelerin kullanımı, şimdiye kadar gördüğümüz gibidir.
 
 ```js
 const invitation = E(psmPublicFacet).makeWantMintedInvitation();
@@ -172,98 +160,71 @@ await E(userSeat).getOfferResult();
 const istPayment = await E(userSeat).getPayout('Minted');
 ```
 
-**PSM Samples**
+**PSM Örnekleri**
 
 [publicMixin](https://github.com/Agoric/agoric-sdk/blob/65d3f14c8102993168d2568eed5e6acbcba0c48a/packages/governance/src/contractHelper.js#L184-L187) 
-is set of helper methods for parameters that are governed. `PSM` uses a helper for governing its parameters.
+yönetilen parametreler için yardımcı metotlar kümesidir. `PSM`, parametrelerini yönetmek için bir yardımcı kullanır.
 
 [want stable](https://github.com/Agoric/agoric-sdk/blob/65d3f14c8102993168d2568eed5e6acbcba0c48a/packages/inter-protocol/test/smartWallet/test-psm-integration.js#L123-L172)
-test in `inter-protocol/test/smartWallet/test-psm-integration.js` show how `PSM` can be used with a `SmartWallet`.
+testi `inter-protocol/test/smartWallet/test-psm-integration.js` içinde `PSM`'nin bir `Akıllı Cüzdan` ile nasıl kullanılabileceğini gösterir.
 
 [test-psm.js](https://github.com/Agoric/agoric-sdk/blob/65d3f14c8102993168d2568eed5e6acbcba0c48a/packages/inter-protocol/test/psm/test-psm.js)
-contains more use cases that are related to `PSM`. Important test that showcases characteristics of `PSM`;
+`PSM` ile ilgili daha fazla kullanım durumu içerir. `PSM`'nin özelliklerini sergileyen önemli test;
 
 * [limit is for minted](https://github.com/Agoric/agoric-sdk/blob/65d3f14c8102993168d2568eed5e6acbcba0c48a/packages/inter-protocol/test/psm/test-psm.js#L341-L364)<br>
-  This tests creates a `PSM` with 2 ISTs against 1 anchor coin. And wants to trade with `PSM` by `MINT_LIMIT` amount of
-anchor. This transaction requires 2 * `MINT_LIMIT` of IST to be minted, so it throws with the message `'Request would exceed mint limit'`.
-This demonstrates that it's not the amount of anchor that matters, but it's the amount of IST that the contract is
-trying to limit.
+  Bu test, 1 anchor coin karşılığında 2 IST'lik bir `PSM` oluşturur. Ve `MINT_LIMIT` miktarında anchor ile `PSM` ile ticaret yapmak ister. Bu işlem, 2 * `MINT_LIMIT` kadar IST basmayı gerektirir, bu yüzden `'Request would exceed mint limit'` mesajı ile hata verir.
+Bu, önemli olanın anchor miktarı değil, sözleşmenin sınırlamaya çalıştığı IST miktarı olduğunu gösterir.
 * [mix of trades: failures do not prevent later service](https://github.com/Agoric/agoric-sdk/blob/65d3f14c8102993168d2568eed5e6acbcba0c48a/packages/inter-protocol/test/psm/test-psm.js#L374-L464)<br>
-  For this test, there are helpers methods implemented to enable trading from a sequence. Basically we want to see that
-if one trade fails, others can keep functioning as expected. 
+
+Bu test için, bir diziden alım satımı etkinleştirmek için yardımcı metotlar uygulanmıştır. Temelde görmek istediğimiz şey, bir alım satımın başarısız olması durumunda diğerlerinin beklenildiği gibi işlev görmeye devam edip etmeyeceği.
 
 ### VaultFactory
-`VaultFactory` is another alternative for purchasing IST. Since IST is a fully collateralized stablecoin, users can only
-exchange IST against some collateral. `VaultFactory` is similar to `PSM` in this sense. The difference lies within 
-the type of collateral accepted. `VaultFactory` can accept any type of ERTP asset as collateral as long as 
-BLD staker governance approves it whereas `PSM` only accepts stablecoins. This significant difference causes one other
-major difference and that is `over-collateralization`. `PSM` trades with other stablecoins in 1:1 ratio, meaning 
-the value of the collateral is equal to received IST value. Since crypto assets can be very volatile, minting IST
-in a 1:1 ratio with another crypto asset would risk IST's value. Remember, IST is a fully-collateralized asset, so
-we want to make sure there's enough collateral to support outstanding IST. `VaultFactory` measures this so called
-`value` of the collateral in terms of US dollars. This is another mechanism that supports IST's stability.
+`VaultFactory`, IST satın almak için başka bir alternatiftir. IST tamamen teminatlandırılmış bir stablecoin olduğundan, kullanıcılar sadece IST'yi bazı teminatlar karşılığında takas edebilir. `VaultFactory`, bu anlamda `PSM`'ye benzer. Fark, kabul edilen teminat türünde yatar. `VaultFactory`, BLD staker yönetiminin onay vermesi koşuluyla her türlü ERTP varlığını teminat olarak kabul edebilirken, `PSM` yalnızca stablecoinleri kabul eder. Bu önemli fark, `aşırı teminatlandırma` olarak adlandırılan diğer büyük bir farklılığa neden olur. `PSM`, diğer stablecoinlerle 1:1 oranında işlem yapar, yani teminatın değeri, alınan IST değeri ile eşittir. Kripto varlıkların çok dalgalı olabilmesi nedeniyle, başka bir kripto varlıkla 1:1 oranında IST basmak IST'nin değerini riske atardı. Unutmayın, IST tamamen teminatlandırılmış bir varlık, bu yüzden yüksek miktarda IST'yi desteklemek için yeterli teminat olduğundan emin olmak istiyoruz. `VaultFactory`, bu sözde `değeri` teminatın ABD doları cinsinden ölçer. Bu, IST'nin istikrarını destekleyen başka bir mekanizmadır.
 
-In order to fully understand how `VaultFactory` works, we first need to understand a few terms:
+`VaultFactory`'nin tam olarak nasıl çalıştığını anlamak için öncelikle birkaç terimi anlamamız gerekiyor:
 
-* **Liquidation Margin:**
-  Remember we said that the USD value of the collateral should be greater than the USD value of the debt. Well, by how much?
-`Liquidation Margin` indicates this margin. Let's say you want to borrow 100 IST and the `Liquidation Margin` is 150%,
- this means that you must put at least $150 worth of collateral in order to borrow the IST you want.
-* **Liquidation:**
-  Let's keep the example above. Now, imagine that you borrowed your 100 IST against $150 worth of collateral.
-What happens if your collateral token's value drops against USD and now your vault has only $125 of collateral. 
-What's the most amount of IST you can borrow for $125 of collateral when `Liquidation Margin` is 150%?
-The answer is: `125 / 1.5 = 83,3`. How much IST you possess? `100 IST`. In a situation like this, `The Inter Protocol`
-considers such a loan as `under-collateralized` and acts before there's any more damage. This action is to: <ins>Sell the
-borrower's collateral in another market against IST and burn the purchased IST.</ins> So that there's no IST floating around
-without collateral. This action is called `Liquidation`.
-* **Interest Rate:**
-An interest is charged on every vault. Similar to real world.
-* **Charging Period vs. Recording Period:** When you inspect `VaultFactory` code you'll notice these two timing related
-similar parameters. The interest charged on every `Charging Period`. Since the amount of interest accrued per one
-charge is too small, the system chooses to wait until some meaningful amount to accrue and then display to the outside
-world. This period displaying accrued interest is called a `Recording Period`.
+* **Likidasyon Marjı:**
+  Teminatın USD değerinin borcun USD değerinden daha yüksek olması gerektiğini söyledik. Peki, ne kadar fazla olmalı? `Likidasyon Marjı` bu marjı belirtir. Diyelim ki 100 IST ödünç almak istiyorsunuz ve `Likidasyon Marjı` %150 ise, istediğiniz IST'yi ödünç alabilmek için en az 150 dolar değerinde teminat koymalısınız.
+* **Likidasyon:**
+  Yukarıdaki örneği devam ettirelim. Şimdi, 150 dolar değerinde teminat karşılığında 100 IST ödünç aldığınızı düşünün. Teminat tokeninizin değeri USD karşısında düşerse ve şimdi kasada sadece 125 dolarlık teminatınız varsa ne olur? `Likidasyon Marjı` %150 olduğunda, 125 dolarlık teminat için en fazla ne kadar IST ödünç alabilirsiniz? Cevap: `125 / 1.5 = 83,3`. Sizde ne kadar IST var? `100 IST`. Böyle bir durumda, `Inter Protokolü` bu tür bir krediyi `yetersiz teminatlandırılmış` olarak kabul eder ve daha fazla zarar olmadan önce harekete geçer. Bu eylem: <ins>Borçlunun teminatını başka bir pazarda IST karşılığında satmak ve satın alınan IST'yi yakmaktır.</ins> Böylece, teminatsız hiçbir IST kalmaz. Bu eyleme `Likidasyon` denir.
+* **Faiz Oranı:**
+Her kasaya bir faiz yüklenir. Gerçek dünyaya benzer bir şekilde.
+* **Şarj Dönemi ve Kayıt Dönemi:** `VaultFactory` kodunu incelediğinizde, bu iki zamanla ilgili benzer parametreyi fark edeceksiniz. Her `Şarj Dönemi`nde faiz yüklenir. Bir şarjda biriken faiz miktarı çok küçük olduğundan, sistem anlamlı bir miktar birikene kadar beklemeyi ve sonra dış dünyaya göstermeyi seçer. Biriken faizleri gösterme bu döneme `Kayıt Dönemi` denir.
 
-#### VaultFactory Basic Design
+#### VaultFactory Temel Tasarım
 
 <img src="images/lectureNine-VaultFactory.png" width='%40'>
 
-`VaultFactory` has a record that stores the `VaultManagers` in a key-value fashion where the `collateralBrand` is key
-and the `vaultManager` is the value. The ability to create new `vaultManagers` belongs to `VaultFactory's` creatorFacet
-which is controlled via `Economic Commitee`. 
+`VaultFactory`, `collateralBrand`'in anahtar ve `vaultManager`'ın değer olduğu bir anahtar-değer yapıdaki `VaultManager`'ları saklar. Yeni `vaultManager`'ları oluşturma yeteneği `VaultFactory'nin` creatorFacet'ine aittir ve bu `Ekonomik Komite` tarafından kontrol edilir.
 
-`VaultManager` is where users actually interact to borrow IST. Every successful borrow results in a new `vault`. 
-These `vaults` are stored in a sorted manner according to their `debt/collateral` ratio. This sorted structure 
-allows `vaultManager` to keep track of under-water vaults. 
+Kullanıcıların gerçekte IST ödünç aldıkları yer `VaultManager`'dır. Her başarılı borçlanma, yeni bir `vault` oluşturur. Bu `vault`lar, `debt/collateral` oranlarına göre sıralı bir şekilde saklanır. Bu sıralı yapı, `vaultManager`'ın su altında kalan vault'ları takip etmesine izin verir.
 
-**Charging Interest**<br>
-`VaultManager` implements an optimization when charging interest on loans. Imagine there are 100 vaults in a vaultManager
-instance. When the chargingPeriod hits, how are you going to charge interest on all 100 loans? Iterate over 100 of them?
-How would that scale? O(n). `VaultManager` does this in O(1) thanks to this smart optimization. 
+**Faiz Tahsilatı**<br>
+`VaultManager`, kredilere faiz tahsil ederken bir optimizasyon uygular. Bir vaultManager örneğinde 100 vault olduğunu düşünün. Şarj dönemi geldiğinde, 100 kredinin tamamına nasıl faiz tahsil edeceksiniz? 100'ün üzerinden geçer misiniz? Bu nasıl ölçeklendirilebilir? O(n). `VaultManager`, bu işlemi bu akıllı optimizasyon sayesinde O(1)'de yapar.
+`VaultManager`'ın `compoundedInterest` adlı bir değişkeni vardır, her şarj döneminde vaultManager bu değişkeni günceller.
+Yeni bir vault oluşturulduğunda, bu birikimli faiz oranının bir anlık görüntüsünü alır. Bir vault'un mevcut borcunu hesaplamak için,
+vault yeni bir birikimli faiz alır ve bu özel vault'a ne kadar faizin biriktiğini hesaplar
+yeni alınan birikimli faizi, oluşturulduğunda aldığı faizSnapshot ile karşılaştırarak. Yeni alınan
+birikimli faiz ile faizSnapshot arasındaki fark, ana borca eklenir ve böylece belirli bir vault'un son borcu elde edilir.
+Bir vault'un borcunu nasıl hesapladığını görmek için [getCurrentDebt](https://github.com/Agoric/agoric-sdk/blob/65d3f14c8102993168d2568eed5e6acbcba0c48a/packages/inter-protocol/src/vaultFactory/vault.js#L753)
+kontrol edin.
 
-`VaultManager` has a variable called `compoundedInterest`, on every chargingPeriod vaultManager updates this variable.
-When a new vault is created, it gets a snapshot of this compoundedInterest. To calculate the current debt of a vault,
-the vault gets a fresh compoundedInterest and calculates how much interest has accrued to this particular vault by
-comparing the fresh compoundedInterest to the interestSnapshot it got when it is created. The difference between fresh
-compoundedInterest and interestSnapshot is then added to the principal debt, to get the final debt of a particular vault.
-Make sure to check [getCurrentDebt](https://github.com/Agoric/agoric-sdk/blob/65d3f14c8102993168d2568eed5e6acbcba0c48a/packages/inter-protocol/src/vaultFactory/vault.js#L753)
-to see how a vault calculates its debt. 
+**Tasfiyeci**<br>
+Tasfiye, su altında bir vault olduğunda gerçekleşir. Vault'ları tasfiye etme mevcut yolu, teminatı
+AMM'deki IST'ye karşı satmaktır. Bu strateji gelecekte değişebilir ama şimdilik mevcut tasarım bu şekildedir.
 
-**Liquidator**<br>
-Liquidation happens when there's an under-water vault. The current way of liquidating vaults is to sell the collateral
-against IST in the AMM. This strategy might change in future but for now this is the current design. 
-
-Agoric's `Higher-order smart contract` nature allows several liquidation strategies to be implemented for one `vaultManager`
-instance. Managers hold an instance to a `liquidator` contract. `VaultManager` is designed to work with multiple
-liquidator contracts. Below are two current liquidator contracts;
+Agoric'in `Higher-order smart contract` yapısı, tek bir `vaultManager`
+örneği için birkaç tasfiye stratejisini uygulama imkanı sunar. Yöneticiler, bir `tasfiyeci` sözleşmesine bir örneği tutarlar. `VaultManager`, birden çok
+tasfiye sözleşmesi ile çalışacak şekilde tasarlanmıştır. İşte mevcut iki tasfiyeci sözleşmesi;
 * [liquidateIncrementally.js](https://github.com/Agoric/agoric-sdk/blob/65d3f14c8102993168d2568eed5e6acbcba0c48a/packages/inter-protocol/src/vaultFactory/liquidateIncrementally.js)
 * [liquidateMinimum.js](https://github.com/Agoric/agoric-sdk/blob/65d3f14c8102993168d2568eed5e6acbcba0c48a/packages/inter-protocol/src/vaultFactory/liquidateMinimum.js)
 
 [setupLiquidator](https://github.com/Agoric/agoric-sdk/blob/65d3f14c8102993168d2568eed5e6acbcba0c48a/packages/inter-protocol/src/vaultFactory/vaultManager.js#L871)
-method is used to update liquidator contact that vaultManager uses.
+metodu, vaultManager'ın kullandığı tasfiyeci irtibatını güncellemek için kullanılır.
 
-#### Use Case 1 - Happy Path
-Below diagram illustrates the "Happy Path" for user borrowing and paying their debt.
+#### Kullanım Durumu 1 - Mutlu Yol
+Aşağıdaki diyagram, kullanıcının borç alıp borcunu ödeme sürecini "Mutlu Yol" olarak gösterir.
+
 ```mermaid
 sequenceDiagram
     actor u as Borrower
@@ -285,8 +246,8 @@ sequenceDiagram
     VaultManager ->> VaultManager: Remove vault 
 ```
 
-#### Use Case 2 - Debt Not Paid
-This diagram on the other hand shows how the liquidation process performs when the borrower does not pay their debt.
+#### Kullanım Durumu 2 - Borç Ödenmedi
+Diğer taraftan, bu diyagram borçlu borcunu ödemezse tasfiye sürecinin nasıl işlediğini gösterir.
 ```mermaid
 sequenceDiagram
     actor u as Borrower
@@ -309,8 +270,8 @@ sequenceDiagram
 ```
 
 ### BLD Boost
-`BLD` is the official staking token of Agoric. `BLD Boost` allows BLD stakers to borrow IST against their staked
-BLD in exchange for the future staking rewards. Below diagram shows this flow:
+`BLD` Agoric'in resmi staking tokenidir. `BLD Boost`, BLD staker'larının gelecek staking ödülleri karşılığında staked
+BLD'lerine karşı IST ödünç almalarına izin verir. Aşağıdaki diyagram bu akışı gösterir:
 
 ```mermaid
 sequenceDiagram
@@ -334,39 +295,34 @@ sequenceDiagram
     attestation  -->> dapp: account status in which 4000 BLD liened
     note right of dapp: Treasury now knows
 
-    note right of dapp: Want to get 450 IST by liening 500 BLD
-    dapp ->> walletBridge: getReturnableAttestation(want: 450 IST, give: 500 BLD-Att)
-    note right of walletBridge: Blocks on user approval in wallet
+`VaultManager`, `compoundedInterest` adında bir değişkene sahip
+    not sağında dapp: 500 BLD'yi teminat göstererek 450 IST almak istiyorum
+    dapp ->> walletBridge: getReturnableAttestation(istem: 450 IST, ver: 500 BLD-Att)
+    not sağında walletBridge: Kullanıcının cüzdanında onay bekliyor
     walletBridge ->> attestation: makeAttestation(500 BLD)
     attestation ->> Cosmos_SDK: increaseLiened(+500 BLD)
-    Cosmos_SDK -->> attestation: new lien balance or throws
+    Cosmos_SDK -->> attestation: yeni teminat dengesi ya da hata atar
 
-    attestation -->> walletBridge: Payment of 500 BLD-Att liened on ag123
+    attestation -->> walletBridge: ag123 üzerinde 500 BLD-Att teminatlı ödeme
 
-    walletBridge ->> stakeFactory: offer w/payment for {give: 500 BLD-Att, want: 450 IST} 
+    walletBridge ->> stakeFactory: {ver: 500 BLD-Att, istem: 450 IST} için ödeme ile teklif yap 
 
-    stakeFactory --> walletBridge: Payment for 450 IST and offerResult
-    walletBridge --> dapp: notifiers from offerResult
+    stakeFactory --> walletBridge: 450 IST ödemesi ve teklif sonucu
+    walletBridge --> dapp: teklif sonucundan bildirimler
 ```
 
-> _Figure 3: [stakeFactory.js](https://github.com/Agoric/agoric-sdk/blob/65d3f14c8102993168d2568eed5e6acbcba0c48a/packages/inter-protocol/src/stakeFactory/README.md)_
+> _Figür 3: [stakeFactory.js](https://github.com/Agoric/agoric-sdk/blob/65d3f14c8102993168d2568eed5e6acbcba0c48a/packages/inter-protocol/src/stakeFactory/README.md)_
 
-The good part is your BLD tokens stay staked. The mechanism allowing `BLD Boost` to know you actually have the BLD
-tokens staked without actually locking them inside the `BLD Boost` contract is called `attestation`. It basically
-checks the account that wants to borrow IST actually has BLD staked and if it does mint a `attestation`. All this 
-checking happens in Cosmos level, so it's very privileged. You can only mint attestations for tokens which have 
-a registered cosmos denom. For more information on attestations you can check out [this conversation](https://github.com/anilhelvaci/dapp-pool-lending-protocol/issues/41#issuecomment-1311713263).
+En iyi kısım, BLD tokenlarınızın teminat olarak kalmış olmasıdır. `BLD Boost`'un sizin gerçekten BLD tokenlarınızı teminat olarak kullandığınızı doğrulamasına olanak sağlayan mekanizma, onları `BLD Boost` sözleşmesinin içinde kilitlemeden `attestation` olarak adlandırılır. Temelde, IST ödünç almak isteyen hesabın gerçekten BLD'ye sahip olduğunu kontrol eder ve eğer sahipse bir `attestation` oluşturur. Tüm bu kontrol işlemleri Cosmos düzeyinde gerçekleşir, yani oldukça ayrıcalıklıdır. Yalnızca kayıtlı bir cosmos denom'u olan tokenlar için attestation oluşturabilirsiniz. Attestation'lar hakkında daha fazla bilgi için [bu konuşmayı](https://github.com/anilhelvaci/dapp-pool-lending-protocol/issues/41#issuecomment-1311713263) inceleyebilirsiniz.
 
-## Liquidity Safeguards
-The Inter Protocol also has some mechanisms to ensure the economy is safe and liquid. 
+## Likidite Güvenceleri
+Inter Protokol, ekonominin güvenli ve likit olduğunu sağlamak için bazı mekanizmalara da sahiptir.
 ### AMM
-Agoric's Automated Market Maker (AMM) contributes this safety insurance by providing a market to liquidate vaults.
-Apart from its role in VaultFactory, AMM also can serve any other DEX. 
+Agoric'in Otomatik Piyasa Yapıcısı (AMM), vault'ları likit hale getirmek için bir piyasa sağlayarak bu güvenliği destekler. AMM, VaultFactory'nin rolünün yanı sıra, herhangi bir başka DEX'e de hizmet verebilir.
 
-For any pool in the AMM, there's always one `Central` asset and one `Secondary` asset. The `Central` asset is always
-IST while `Secondary` can vary. Anybody can create a new pool in the AMM, let's go over the steps for that;
+AMM'deki her havuzda her zaman bir `Central` varlık ve bir `Secondary` varlık bulunur. `Central` varlık her zaman IST iken, `Secondary` değişkenlik gösterebilir. Herkes AMM'de yeni bir havuz oluşturabilir, bunun adımlarını aşağıda görelim;
 
-1. You must introduce the `Secondary` asset's issuer to AMM
+1. `Secondary` varlığın ihracatçısını AMM'ye tanıtmalısınız
 ```js
     /** @type Issuer */
     const lpTokenIssuer = await E(ammPublicFacet).addIssuer(
@@ -375,12 +331,9 @@ IST while `Secondary` can vary. Anybody can create a new pool in the AMM, let's 
     );
 ```
 
-This process is necessary because AMM's `zcf` instance needs to know the issuer, and it's corresponding keyword in order
-to perform `reallocations`. This operation results in another issuer being returned. Since AMM is a DEX Liquidity Providers,
- it gets an LP token in exchange for their supplied liquidity. Here we get the issuer of that LP token so that we can build 
-proposals for it.
+Bu işlem, AMM'nin `zcf` örneğinin ihracatçıyı ve ona karşılık gelen anahtar kelimeyi bilmesi gerektiği için gereklidir. Bu işlem, başka bir ihracatçının dönmesiyle sonuçlanır. AMM, bir DEX Likidite Sağlayıcısı olduğu için, sağladığı likidite karşılığında bir LP tokeni alır. Burada, bu LP tokeninin ihracatçısını alıyoruz, böylece onun için teklifler oluşturabiliriz.
 
-2. Now we can add the pool
+2. Artık havuzu ekleyebiliriz
 ```js
     /** @type UserSeat */
     const addLiquiditySeat = await E(home.zoe).offer(
@@ -390,8 +343,7 @@ proposals for it.
     );
 ```
 
-As you can see this is just another Zoe offer where the invitation is fetched from `E(ammPublicFacet).addPoolInvitation()`.
- Notice that we get this invitation from `ammPublicFacet`. Let's break down the structure of the `proposal`:
+Gördüğünüz gibi bu, daveti `E(ammPublicFacet).addPoolInvitation()`'dan aldığımız başka bir Zoe teklifidir. Bu daveti `ammPublicFacet`'ten aldığımızı fark edin. `Proposal`ın yapısını ayrıştıralım:
 
 ```js
     const proposal = harden({
@@ -403,8 +355,7 @@ As you can see this is just another Zoe offer where the invitation is fetched fr
     });
 ```
 
-Notice that we supply both `Secondary` and `Central` in the `give` part of the proposal. And in exchange we `want` our
-LP tokens. Let's see the payment for this proposal;
+`Give` bölümünde hem `Secondary` hem de `Central`'i sunduğumuza dikkat edin. Ve karşılığında LP tokenlerimizi `want` ediyoruz. Bu teklif için ödemeye bakalım;
 
 ```js
    const payments = {
@@ -413,18 +364,13 @@ LP tokens. Let's see the payment for this proposal;
     };
 ```
 
-When we do:
+Eğer şunu yaparsak:
 
 ```js
 await E(addLiquiditySeat).getOfferResult();
 const payout = await E(addLiquiditySeat).getPayout('Liquidity');
 ```
 
-We'll have our LP tokens in the payout.
+Ödemede LP tokenlerimiz olacak.
 
-For further usage and examples of interacting with AMM, consider checking out [StopLoss-AMM](https://github.com/Jorge-Lopes/stop-loss-amm) code 
-which is a bounty we completed for Agoric.
-
-### Reserve
-There's an [ongoing discussion](https://github.com/Agoric/agoric-sdk/discussions/6967) about the `Reserve`, 
-we'll update here once our questions are settled.
+Daha fazla kullanım ve AMM ile etkileşim örnekleri için [StopLoss-AMM](https://github.com/Jorge-Lopes/stop-loss-amm) kodunu kontrol etmeyi düşünün. Agoric için tamamladığımız bir ödül. ### Rezerve "Rezerv" hakkında [devam eden bir tartışma](https://github.com/Agoric/agoric-sdk/discussions/6967) var, Sorularımız çözüldükten sonra burayı güncelleyeceğiz.
