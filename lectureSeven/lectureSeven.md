@@ -1,200 +1,259 @@
-# Lecture Seven - Multiuser Dapps, Lending Protocol
-## Table of Contents
-* Multiuser Dapps
-  * SwingSet and Cosmos Layer
+# Ders Yedi - Çok Kullanıcılı Dapps, Kredi Protokolü
+## İçindekiler
+* Çok Kullanıcılı Dapps
+  * SwingSet ve Cosmos Katmanı
     * SwingSet (AgoricVM)
-  * `cosmic-swingset` Package
-    * Prerequisites
-    * Multiple `ag-solos` with `cosmic-swingset`
-      * How to start an `ag-solo` with 1M ISTs?
-  * Sample: How do we showcase LendingPool using 3 `ag-solos` and one node `local-chain`?
-    * Make sure your dapp UI connects to the correct `ag-solo`
-* Pool Based Lending Protocol
-  * What is a Lending Pool?
-  * How does a Lending Pool work?
-  * Sample Use Case
+  * `cosmic-swingset` Paketi
+    * Gereklilikler
+    * `cosmic-swingset` ile birden fazla `ag-solo`
+      * 1M IST ile bir `ag-solo` nasıl başlatılır?
+  * Örnek: LendingPool'u 3 `ag-solo` ve bir node `local-chain` kullanarak nasıl sergileriz?
+    * Dapp UI'nızın doğru `ag-solo`ya bağlandığından emin olun
+* Havuz Temelli Kredi Protokolü
+  * Kredi Havuzu Nedir?
+  * Kredi Havuzu Nasıl Çalışır?
+  * Örnek Kullanım Senaryosu
 
-# Multiuser Dapps
-Decentralization enables us to do business with **people we don't trust.** Hence, most of the dapps designed to 
-work in a multiuser manner where users interacting with each other. Like, trading assets, renting NFTs etc. This  
-means that as a dapp developer, you might need to test your dapps using multiple `ag-solos`. 
+# Çok Kullanıcılı Dapps
+Merkezsizleşme, **güvenmediğimiz kişilerle** iş yapmamızı sağlar. Bu nedenle, dapp'ler genellikle çok kullanıcılı bir şekilde tasarlanır ve kullanıcılar birbirleriyle et interact eder. Örneğin, varlıkları ticaret yapma, NFT'leri kiralamak vb. Bu, bir dapp geliştirici olarak, dapp'lerinizi birden fazla `ag-solo` kullanarak test etmeniz gerektiği anlamına gelir.
 
-Agoric offers a `sim-chain` feature for quick testing with a simulated chain and an `ag-solo` running together.
-This is nice and useful but for a structure where multiple `ag-solos` need to work with a shared blockchain, `sim-chain`
-falls short. We need a way to separate the blockchain and `ag-solo` locally. There's `cosmic-swingset` package for that.
-But first, some context.
+Agoric, simüle edilmiş bir zincir ve bir `ag-solo` ile hızlı testler yapmak için bir `sim-chain` özelliği sunar.
+Bu güzel ve faydalıdır ancak birden fazla `ag-solo`nun paylaşılan bir blockchain ile çalışması gereken bir yapı için, `sim-chain` yetersiz kalır. Blockchain ve `ag-solo`nun yerel olarak ayrılması için bir yol gereklidir. Bunun için `cosmic-swingset` paketi vardır.
+Ama önce, biraz bağlam.
 
-## Context: SwingSet and Cosmos Layer
+## Bağlam: SwingSet ve Cosmos Katmanı
 
-Below is a diagram showing the `Agoric Tech Stack`
+Aşağıdaki diagram, `Agoric Teknoloji Yığını`nı göstermektedir.
 
 <img src="https://docs.agoric.com/assets/img/stack.913ad41b.svg" width='60%'>
 
-> _Figure 1: Agoric Tech Stack, image from [Agoric Docs](https://docs.agoric.com/guides/platform/)_
+> _Şekil 1: Agoric Teknoloji Yığını, resim [Agoric Dökümanları](https://docs.agoric.com/guides/platform/)ndan alınmıştır_
 
-As you can see at the bottom layer there's the `Cosmos/Tendermint` which handles consensus across the Agoric network.
-On top of that, there's `SwingSet`:
+Alt katmanda, Agoric ağı arasında uzlaşmayı sağlayan `Cosmos/Tendermint` vardır.
+Onun üzerinde, `SwingSet` vardır:
 
-### What is `SwingSet`?
-`SwingSet` is a kernel that handles communication between `vats`. It's also called `AgoricVM`. Each `vat` inside 
-a `SwingSet` kernel is a hardened version of the XS JavaScript Engine. Below is a diagram that visualizes a 
-`SwingSet`:
+### `SwingSet` Nedir?
+`SwingSet`, `vat`lar arasındaki iletişimi yöneten bir çekirdektir. Ayrıca `AgoricVM` olarak da adlandırılır. Bir `SwingSet` çekirdeğindeki her `vat`, XS JavaScript Engine'in sertleştirilmiş bir versiyonudur. Aşağıda, bir `SwingSet`i görselleştiren bir diyagram bulunmaktadır:
 
 <img src="images/swingset.png" width='60%'>
 
-> _Figure 2: SwingSet Kernel_
+> _Şekil 2: SwingSet Çekirdeği_
 
-Above screenshot is taken from [Agoric Swingset Kernel and Userspace, Phase 2](https://agoric.com/wp-content/uploads/2021/11/informal-agoric-report-phase2.pdf) 
-security audit. Do not forget to check it out and other reports at [Agoric Security](https://agoric.com/security/).
+Yukarıdaki ekran görüntüsü [Agoric Swingset Kernel and Userspace, Phase 2](https://agoric.com/wp-content/uploads/2021/11/informal-agoric-report-phase2.pdf) 
+güvenlik denetiminden alınmıştır. [Agoric Güvenlik](https://agoric.com/security/)deki diğer raporları kontrol etmeyi unutmayın.
 
-## `cosmic-swingset` Package
+## `cosmic-swingset` Paketi
 
 [cosmic-swingset](https://github.com/Agoric/agoric-sdk/tree/65d3f14c8102993168d2568eed5e6acbcba0c48a/packages/cosmic-swingset)
-has a lot of useful features for running an `Agoric VM` that runs on an actual cosmos node.
+gerçek bir cosmos düğümünde çalışan bir `Agoric VM` çalıştırmak için birçok faydalı özelliğe sahiptir.
 
-### Prerequisites
-`Cosmos SDK` is built using `Go Programming Language`. Thus, in order to access its consensus features we need some
-helpers to build the bridge between `SwingSet` and consensus layer. These helpers are;
+### Gereklilikler
+`Cosmos SDK` `Go Programlama Dili` kullanılarak oluşturulmuştur. Dolayısıyla, uzlaşma özelliklerine erişmek için, `SwingSet` ve uzlaşma katmanı arasında köprü kuracak yardımcılara ihtiyacımız var. Bu yardımcılar;
 * `agd`
 * `ag-cosmos-helper`
 
-We need to build these from source;
+Bu yardımcıları kaynaktan inşa etmemiz gerekiyor;
 
-> You can check out [Agoric Docs - Starting Multiuser Dapps - Usage - Steps 3 and 4](https://docs.agoric.com/guides/dapps/starting-multiuser-dapps.html#usage), but I'll put the steps here anyway, for convenience.
+> [Agoric Dökümanları - Çok Kullanıcılı Dapp'lerin Başlatılması - Kullanım - 3. ve 4. Adımlar](https://docs.agoric.com/guides/dapps/starting-multiuser-dapps.html#usage)ı kontrol edebilirsiniz, ancak yine de kolaylık olması için adımları buraya koyacağım.
 
 ```shell
 cd agoric-sdk/packages/cosmic-swingset && make
 ```
 
-Then;
+Sonra;
 
 ```shell
-# Display the directory that should be in your $PATH.
+# $PATH içerisinde olması gereken dizini gösterir.
 echo ${GOBIN-${GOPATH-$HOME/go}/bin}
-# Attempt to run a binary that was installed there.
+# Orada kurulu bir ikiliyi çalıştırmayı dener.
 ag-cosmos-helper version --long
 ```
 
-Important thing here is that `agd` and `ag-cosmos-helper` need to be in your `$PATH`.
+Burada önemli olan şey, `agd` ve `ag-cosmos-helper`'ın `$PATH` içerisinde olması gerekliliğidir.
 
-For a successful `make` operation check out the prerequisites at
+Başarılı bir `make` işlemi için gereklilikleri
 [cosmic-swingset/README.md](https://github.com/Agoric/agoric-sdk/tree/65d3f14c8102993168d2568eed5e6acbcba0c48a/packages/cosmic-swingset#build-from-source) 
+adresinden kontrol edebilirsiniz.
 
-### Multiple `ag-solos` with `cosmic-swingset`
-`cosmic-swingset` package contains 4 scenarios in total for different configurations;
-* scenario1
-* scenario2
-* scenario3
-* scenario0
+### `cosmic-swingset` ile Birden Fazla `ag-solo`
+`cosmic-swingset` paketi toplamda farklı konfigürasyonlar için 4 senaryo içerir;
+* senaryo1
+* senaryo2
+* senaryo3
+* senaryo0
+  
+# Ders Yedi - Çok Kullanıcılı Dapps, Kredi Protokolü
+## İçindekiler
+* Çok Kullanıcılı Dapps
+  * SwingSet ve Cosmos Katmanı
+    * SwingSet (AgoricVM)
+  * `cosmic-swingset` Paketi
+    * Ön Koşullar
+    * `cosmic-swingset` ile Çoklu `ag-solos`
+      * 1M IST ile bir `ag-solo` nasıl başlatılır?
+  * Örnek: LendingPool'u 3 `ag-solo` ve bir `local-chain` düğümü kullanarak nasıl sergileriz?
+    * Dapp UI'nızın doğru `ag-solo`'ya bağlandığından emin olun
+* Havuz Temelli Kredi Protokolü
+  * Bir Kredi Havuzu nedir?
+  * Bir Kredi Havuzu nasıl çalışır?
+  * Örnek Kullanım Durumu
 
-Only `scenario2` support configuration for multi `ag-solo` setup. So we'll focus on that here. See
+# Çok Kullanıcılı Dapps
+Merkeziyetsizlik, bize **güvenmediğimiz kişilerle** iş yapma olanağı sağlar. Dolayısıyla, çoğu dapp, kullanıcıların birbiriyle etkileşimde bulunduğu çok kullanıcılı bir şekilde tasarlanmıştır. Örneğin, varlık alışverişi, NFT kiralaması vb. Bu, bir dapp geliştirici olarak, dapp'lerinizi birden çok `ag-solo` kullanarak test etmeniz gerekebileceği anlamına gelir.
+
+Agoric, bir simüle zinciri ve bir `ag-solo`'nun birlikte çalıştığı hızlı testler için bir `sim-chain` özelliği sunar. Bu güzel ve kullanışlıdır, ancak birden çok `ag-solo`'nun paylaşılan bir blockchain ile çalışması gereken bir yapı için `sim-chain` yetersiz kalır. Blockchain ve `ag-solo`'yu yerelde ayırmak için bir yola ihtiyacımız var. Bunun için `cosmic-swingset` paketi var. Ama önce, biraz bağlam.
+
+## Bağlam: SwingSet ve Cosmos Katmanı
+
+Aşağıda `Agoric Tech Stack`'in bir diyagramı gösterilmektedir
+
+<img src="https://docs.agoric.com/assets/img/stack.913ad41b.svg" width='60%'>
+
+> _Şekil 1: Agoric Teknoloji Yığını, resim [Agoric Dokümantasyonu](https://docs.agoric.com/guides/platform/)ndan alınmıştır_
+
+Alt katmanda `Cosmos/Tendermint` bulunmaktadır ve bu, Agoric ağı boyunca konsensüsü yönetir. Bunun üstünde `SwingSet` bulunur:
+
+### `SwingSet` Nedir?
+`SwingSet` bir çekirdektir ve `vat`lar arasındaki iletişimi yönetir. Aynı zamanda `AgoricVM` olarak da adlandırılır. Bir `SwingSet` çekirdeği içindeki her `vat`, XS JavaScript Motorunun sertleştirilmiş bir sürümüdür. Aşağıda bir `SwingSet`'i görselleştiren bir diyagram bulunmaktadır:
+
+<img src="images/swingset.png" width='60%'>
+
+> _Şekil 2: SwingSet Çekirdeği_
+
+Yukarıdaki ekran görüntüsü [Agoric Swingset Çekirdeği ve Kullanıcı Alanı, Faz 2](https://agoric.com/wp-content/uploads/2021/11/informal-agoric-report-phase2.pdf) güvenlik denetiminden alınmıştır. [Agoric Güvenlik](https://agoric.com/security/) bölümündeki diğer raporları kontrol etmeyi unutmayın.
+
+## `cosmic-swingset` Paketi
+
+[cosmic-swingset](https://github.com/Agoric/agoric-sdk/tree/65d3f14c8102993168d2568eed5e6acbcba0c48a/packages/cosmic-swingset) gerçek bir cosmos düğümünde çalışan bir `Agoric VM`'yi çalıştırmak için birçok kullanışlı özelliklere sahiptir.
+
+### Ön Koşullar
+`Cosmos SDK` `Go Programlama Dili` kullanılarak oluşturulmuştur. Bu nedenle, konsensüs özelliklerine erişmek için `SwingSet` ve konsensüs katmanı arasındaki köprüyü oluşturacak yardımcılara ihtiyacımız var. Bu yardımcılar şunlardır:
+* `agd`
+* `ag-cosmos-helper`
+
+Bu yardımcıları kaynaktan oluşturmamız gerekiyor;
+
+> [Agoric Dokümantasyonu - Çok Kullanıcılı Dapp'ler Başlatma - Kullanım - Adım 3 ve 4](https://docs.agoric.com/guides/dapps/starting-multiuser-dapps.html#usage)'ü kontrol edebilirsiniz, ama kolaylık olması açısından adımları buraya da ekleyeceğim.
+
+```shell
+cd agoric-sdk/packages/cosmic-swingset && make
+```
+
+Sonra;
+
+```shell
+# Yolunuzda olması gereken dizini görüntüler.
+echo ${GOBIN-${GOPATH-$HOME/go}/bin}
+# Orada kurulu olan bir ikiliyi çalıştırmaya çalışır.
+ag-cosmos-helper version --long
+```
+
+Burada önemli olan şey, `agd` ve `ag-cosmos-helper`'ın `$PATH`'inizde olması gerektiğidir.
+
+Başarılı bir `make` işlemi için [cosmic-swingset/README.md](https://github.com/Agoric/agoric-sdk/tree/65d3f14c8102993168d2568eed5e6acbcba0c48a/packages/cosmic-swingset#build-from-source) 'da belirtilen ön koşulları kontrol edin.
+
+### `cosmic-swingset` ile Çoklu `ag-solos`
+`cosmic-swingset` paketi, farklı konfigürasyonlar için toplam 4 senaryo içerir
+
+Sadece `scenario2`, çoklu `ag-solo` kurulumu için yapılandırmayı destekler. Bu yüzden burada ona odaklanacağız. Daha fazla bilgi için 
 [cosmic-swingset/README.md](https://github.com/Agoric/agoric-sdk/tree/65d3f14c8102993168d2568eed5e6acbcba0c48a/packages/cosmic-swingset)
-and 
+ve 
 [cosmic-swingset/Makefile](https://github.com/Agoric/agoric-sdk/blob/65d3f14c8102993168d2568eed5e6acbcba0c48a/packages/cosmic-swingset/Makefile)
-for information on other scenarios and implementation details. 
+adreslerine bakabilirsiniz.
 
-
-In order to start a multiuser dapp using `cosmic-swingset` package, you must first setup the environment;
+`cosmic-swingset` paketi kullanarak çok kullanıcılı bir dapp başlatmak için önce ortamı ayarlamanız gerekir;
 
 ```shell
 cd agoric-sdk/packages/cosmic-swingset
 make scenario2-setup BASE_PORT=8000 NUM_SOLOS=3
 ```
 
-* `NUM_SOLOS`: Number of `ag-solos` you want to create, default is one.
-* `BASE_PORT`: Indicates the port for the first `ag-solo`, increments by one for other `ag-solos`, if any. For the above
-configuration, ports used are: 8000, 8001, 8002.
+* `NUM_SOLOS`: Oluşturmak istediğiniz `ag-solos` sayısı, varsayılan değer birdir.
+* `BASE_PORT`: İlk `ag-solo` için port belirtir, diğer `ag-solos`'lar için bir arttırır. Yukarıdaki
+konfigürasyonda kullanılan portlar: 8000, 8001, 8002.
 
-Once the setup is completed, we can go ahead and start the chain;
+Kurulum tamamlandığında, zinciri başlatabiliriz;
 
 ```shell
 make scenario2-run-chain-economy
 ```
 
-There are several options for chain configuration. In the Pool Based Lending Protocol, we use the configuration
-`scenario2-run-chain-economy` because we need to interact with Agoric's economic services. If you don't need to
-interact with any of those stuff, you can just simply use `scenario2-run-chain` which is faster to boot;
+Zincir konfigürasyonu için birkaç seçenek vardır. Havuz Tabanlı Kredi Protokolü'nde, Agoric'in ekonomik hizmetlerle etkileşimde bulunmamız gerektiği için `scenario2-run-chain-economy` konfigürasyonunu kullanıyoruz. Eğer bu tür bir etkileşime ihtiyacınız yoksa, daha hızlı başlaması için basitçe `scenario2-run-chain` kullanabilirsiniz;
 
 ```shell
 make scenario2-run-chain
 ```
 
-Once you startup the chain(with any of the configurations above), now it is time to start the `ag-solos`;
+Zinciri (yukarıdaki konfigürasyonlardan herhangi biri ile) başlattıktan sonra, artık `ag-solos`'ları başlatabiliriz;
 
 ```shell
 cd agoric-sdk/packages/cosmic-swingset
 make scenario2-run-client BASE_PORT=8000
 ```
 
-There's another env variable has to be set when starting the second `ag-solos` and so on. That is 
-`SOLO_OTEL_EXPORTER_PROMETHEUS_PORT` which specifies a port for [Prometheus](https://prometheus.io/)
-to monitor the `ag-solos` metrics. Thus, for the second `ag-solo` the startup command would be;
+İkinci `ag-solos`'u ve sonrakileri başlatırken ayarlanması gereken başka bir ortam değişkeni vardır. Bu, [Prometheus](https://prometheus.io/)
+tarafından `ag-solos` ölçümlerini izlemek için bir port belirleyen `SOLO_OTEL_EXPORTER_PROMETHEUS_PORT`'tur. Bu yüzden, ikinci `ag-solo` için başlatma komutu şu şekildedir;
 
 ```shell
 cd agoric-sdk/packages/cosmic-swingset
-make scenario2-run-client BASE_PORT=8001 SOLO_OTEL_EXPORTER_PROMETHEUS_PORT=9466 # 9465 is the default value
+make scenario2-run-client BASE_PORT=8001 SOLO_OTEL_EXPORTER_PROMETHEUS_PORT=9466 # 9465 varsayılan değerdir
 ```
 
-You can repeat the step above for as many `ag-solos` as you want by replacing the env variables with appropriate ones.
+Yukarıdaki adımı, uygun ortam değişkenlerini değiştirerek istediğiniz kadar `ag-solos` için tekrar edebilirsiniz.
 
-#### How to start an `ag-solo` with 1M ISTs?
-Let's imagine you have a dapp that depends on some environmental components. For instance, `LendingPool` needs some
-AMM Pool to exist in order to function properly. Thus, the `creator` needs to add that pool to AMM. This operation
-needs a lot of IST and the `creator` might run out of IST if it is bootstrapped with default _coin config_. To 
-prevent this from happening we use this cool trick:
+#### 1M IST ile bir `ag-solo` Nasıl Başlatılır?
+Bazı çevresel bileşenlere bağlı olan bir dapp'ınız olduğunu hayal edin. Örneğin, `LendingPool`'un düzgün çalışması için bazı AMM Havuzlarının var olması gerekmektedir. Bu yüzden, `creator`'un bu havuzu AMM'ye eklemesi gerekiyor. Bu işlem çok fazla IST gerektirir ve `creator`, varsayılan _coin config_ ile başlatıldığında IST'lerini tüketebilir. Bunu önlemek için şu havalı hileyi kullanıyoruz:
 
 ```shell
 cd agoric-sdk/packages/cosmic-swingset
 make scenario2-run-client BASE_PORT=8000 SOLO_COINS='13000000ubld,1000000000000uist,1122000000ibc/usdc1234,3344000000ibc/atom1234'
 ```
 
-Imagine the `creator` runs on the port 8000, the env variable `SOLO_COINS` contains the _coin config_ as a string.
-There's a default value set in Makefile, but it is possible to override this value as shown in the above command.
-Notice the number of `uist`, decimal places for IST is `6` so `1M * 10 ** 6` units of IST is bootstrapped to 
-the corresponding `ag-solos` wallet. This is a useful trick that you can consider for your tests with `scenario2`.
+`creator`'ın port 8000'de çalıştığını hayal edin, `SOLO_COINS` ortam değişkeni _coin config_'i bir dize olarak içerir. Makefile'da bir varsayılan değer ayarlanmıştır, ancak yukarıdaki komutta gösterildiği gibi bu değeri değiştirmek mümkündür.
+`uist` sayısına dikkat edin, IST için ondalık basamak sayısı `6`'dır yani `1M * 10 ** 6` IST birimi ilgili `ag-solos` cüzdanına önyüklenir. Bu, `scenario2` ile testleriniz için düşünebileceğiniz kullanışlı bir hiledir.
 
-## Sample: How do we showcase LendingPool using 3 `ag-solos` and one node `local-chain`?
-In LendingPool, we use a network configuration where there are 3 `ag-solos` and one local blockchain. Those `ag-solos`
-are;
+## Örnek: LendingPool'u 3 `ag-solos` ve bir `local-chain` düğümü kullanarak nasıl sergileriz?
+LendingPool'da, 3 `ag-solos` ve bir yerel blockchain olan bir ağ konfigürasyonu kullanırız. Bu `ag-solos`'lar;
 * Creator
 * Alice
 * Bob
 
-Recall that `creator` has to bootstrap some stuff necessary for the showcase scenario. Below is the simple diagram;
+`creator`'ın sergileme senaryosu için g
+
+erekli bazı şeyleri önyüklemesi gerektiğini hatırlayın. Aşağıda basit bir diyagram bulunmaktadır;
 
 <img src="images/lendingPool.png" width='60%'>
 
-We talked about much of the commands we use to setup this environment above, so I'll just put them all together here;
+Yukarıda bu ortamı ayarlamak için kullandığımız birçok komut hakkında konuştuk, bu yüzden hepsini burada bir araya getireceğim;
 
-Terminal One:
+Birinci Terminal:
 
 ```shell
 cd agoric-sdk/packages/cosmic-swingset
 make scenario2-setup BASE_PORT=8000 NUM_SOLOS=3 && make scenario2-run-chain-economy
 ```
 
-Terminal Two, Creator:
+İkinci Terminal, Creator:
 
 ```shell
 cd agoric-sdk/packages/cosmic-swingset
 make scenario2-run-client BASE_PORT=8000 SOLO_COINS='13000000ubld,1000000000000uist,1122000000ibc/usdc1234,3344000000ibc/atom1234'
 ```
-
-Terminal Three, Alice:
+Üçüncü Terminal, Alice:
 
 ```shell
 cd agoric-sdk/packages/cosmic-swingset
 make scenario2-run-client BASE_PORT=8001 SOLO_OTEL_EXPORTER_PROMETHEUS_PORT=9466
 ```
 
-Terminal Four, Bob:
+Dördüncü Terminal, Bob:
 
 ```shell
 cd agoric-sdk/packages/cosmic-swingset
 make scenario2-run-client BASE_PORT=8002 SOLO_OTEL_EXPORTER_PROMETHEUS_PORT=9467
 ```
 
-Terminal Five:
+Beşinci Terminal:
 
 ```shell
 cd agoric-sdk/packages/cosmic-swingset/t1
@@ -203,114 +262,92 @@ agoric open --no-browser --hostport=127.0.0.1:8001 --repl
 agoric open --no-browser --hostport=127.0.0.1:8002 --repl
 ```
 
-`t1` directory is where the user information like keys and addresses are stored. The flag `--hostport` indicates the
-address of the `ag-solo` that this command is going to connect when executing. So the second `agoric open` opens the
-wallet for Alice and the third one opens the wallet for Bob.
+`t1` dizini, anahtarlar ve adresler gibi kullanıcı bilgilerinin saklandığı yerdir. `--hostport` bayrağı, bu komutun çalıştırıldığında bağlanacağı `ag-solo`nun adresini belirtir. Bu yüzden ikinci `agoric open` Alice'in cüzdanını açar ve üçüncüsü Bob'un cüzdanını açar.
 
-### Make sure your Dapp UI connects to the correct `ag-solo`
-Let's assume you completed all the steps above, deployed LendingPool contracts and started the dapp UI. Recall that
-the dapp UI needs a `walletBridge` object in order to interact with Agoric network. Since the `walletBridge` can only
-be dispatched via a user approval, dapp UI needs to connect to the `ag-solo` it is going to represent. The way this is
-handled is by opening a webSocket to the `ag-solo`. Remember the configuration we have running, 3 `ag-solos` right?
-Alice and Bob will have their own dapp UI, so how are we going to make sure that those dapp UIs are connected to the
-correct `ag-solo`? Agoric introduces a service for that hosted on `local.agoric.com`. Below diagram illustrates the
-flow;
+### Dapp UI'nızın doğru `ag-solo`ya bağlandığından emin olun
+Yukarıdaki adımların hepsini tamamladığınızı, LendingPool sözleşmelerini yerleştirdiğinizi ve dapp UI'ı başlattığınızı varsayalım. Dapp UI'nın Agoric ağı ile etkileşim kurmak için bir `walletBridge` nesnesine ihtiyacı vardır. `WalletBridge` yalnızca bir kullanıcı onayıyla gönderilebildiğinden, dapp UI temsil edeceği `ag-solo`ya bağlanmalıdır. Bu durum, `ag-solo`ya bir webSocket açarak ele alınır. Çalıştırdığımız yapılandırmayı, 3 `ag-solo` olduğunu hatırlayın, değil mi? Alice ve Bob kendi dapp UI'larına sahip olacaklar, peki bu dapp UI'ların doğru `ag-solo`ya nasıl bağlandığından emin olacağız? Agoric, bunun için `local.agoric.com` adlı bir hizmet sunuyor. Aşağıdaki diyagram akışı gösterir;
 
 <img src="images/walletBridge.png" width='60%'>
 
-As we said dapp UI needs an address to open a WebSocket to, the way it acquires that is to ask `local.agoric.com`.
-In the step number `0`, dapp dev enters the address of the `ag-solo` and `local.agoric.com` keeps that information
-in browser storage like _cookies_. Thus, in order to have different dapp UIs connect to different `ag-solos`, we need
-a separate storage space for the browser we are trying to connect to `ag-solo` from. Options for that might be;
-* Using different browser like Firefox and Chrome for Alice and Bob
-* If you're using Chrome, creating different profiles for Alice and Bob
+Dedik ki, dapp UI'nın bir WebSocket açmak için bir adrese ihtiyacı var, bunu nasıl elde ettiği `local.agoric.com`a sorarak olur. Adım numarası `0`'da, dapp geliştiricisi `ag-solo`nun adresini girer ve `local.agoric.com` bu bilgileri tarayıcı depolamasında, _çerezler_ gibi tutar. Bu yüzden, farklı dapp UI'ların farklı `ag-solos`'lara bağlanabilmesi için, `ag-solo`ya bağlanmaya çalıştığımız tarayıcı için ayrı bir depolama alanına ihtiyacımız var. Bunun için seçenekler olabilir;
+* Alice ve Bob için farklı tarayıcılar kullanmak, Firefox ve Chrome gibi
+* Chrome kullanıyorsanız, Alice ve Bob için farklı profiller oluşturmak
 
-Since LendingPool UI is most compatible with Chrome (for now), we choose the second option. It looks like this:
+LendingPool UI'si şu anda Chrome ile en uyumlu olduğu için, ikinci seçeneği tercih ediyoruz. Bu şöyle görünüyor:
 
 <img src="images/aliceBob.png" width='80%'>
 
-In the diagram above, red profile represents Alice whereas green one represents Bob. Dapp UI for Alice should be 
-opened in the red profile while Bob's dapp UI should be opened in green one. 
+Yukarıdaki diyagramda, kırmızı profil Alice'i temsil ederken yeşil profil Bob'u temsil ediyor. Alice'in dapp UI'si kırmızı profilde açılmalı, Bob'un dapp UI'si yeşil olanıda açılmalıdır.
 
-# Pool Based Lending Protocol
-## What is a Lending Pool?
-Lending Pool is a DeFi concept that has so many live examples such as [Compound Finance](https://compound.finance/) 
-and [AAVE](https://aave.com/). The basic idea is that there's a liquidity pool where LPs (Liquidity Providers) supply 
-liquidity seeking various returns such as interest. Most of the time, these lending pools have their own governance
-token they distribute to LPs as well. One of the main benefits is that lending pools do not perform the same `GateKeeping` 
-as the banks are currently doing on who gets to access the liquidity and who does not. 
+# Havuz Tabanlı Borç Verme Protokolü
+## Bir Borç Verme Havuzu Nedir?
+Borç Verme Havuzu, [Compound Finance](https://compound.finance/) ve [AAVE](https://aave.com/) gibi pek çok canlı örneği olan bir DeFi kavramıdır. Temel fikir, LP'lerin (Likidite Sağlayıcıları) çeşitli getiriler aradığı bir likidite havuzu olmasıdır. Çoğu zaman, bu borç verme havuzlarının kendi yönetim tokenları da vardır ve bunları da LP'lerine dağıtırlar. Ana faydalardan biri, borç verme havuzlarının şu anda likiditeye kimin erişeceği ve kimin erişemeyeceği konusunda bankaların yaptığı aynı `GateKeeping` işlemi yapmamasıdır.
 
-## How does a Lending Pool work?
-The idea is great, but how's that going work? Our `Pool Based Lending Protocol` is inspired by [Compound Finance](https://compound.finance/)
-which one of the biggest decentralized lending protocols, if not the biggest. So I'll use some of Compound's logic
-in order to explain the protocol. We explain how Compound Finance works in our [blog post at BytePitch](https://bytepitch.com/blog/pool-based-lending-protocol-agoric/). 
-Do not forget to check it out if you want to learn more.
+## Bir Borç Verme Havuzu Nasıl Çalışır?
+Fikir harika, ama bu nasıl çalışacak? `Havuz Tabanlı Borç Verme Protokolümüz`, en büyük merkezi olmayan borç verme protokollerinden biri olan, belki de en büyük olan [Compound Finance](https://compound.finance/)'dan esinlendi. Bu yüzden protokolü açıklamak için Compound'un bazı mantığını kullanacağım. Compound Finance'ın nasıl çalıştığını [BytePitch'teki blog yazımızda](https://bytepitch.com/blog/pool-based-lending-protocol-agoric/) anlatıyoruz. 
 
-One of the main features for a decentralized lending protocol is **Over-collateralization**. Here's an example of
-over-collateralization from our blog post:
+Daha fazla öğrenmek isterseniz kontrol etmeyi unutmayın.
 
-"_The word 'over' means that the value of collateral should be higher than the value of debt._ 
-_For instance, if you have $100 to use as collateral and the collateralization factor is %80 then you_ 
-_can borrow $80 at most. The main idea is to secure the lender in a way that even if the borrower doesn't_ 
-_pay their debt, the lender does not lose money._"
+Bir merkezi olmayan borç verme protokolünün ana özelliklerinden biri **Aşırı teminatlandırma**dır. Blog yazımızdan aşırı teminatlandırma hakkında bir örnek:
 
-There are three formulas `Pool Based Lending Protocol` is depending on. Check out [Compound Whitepaper](https://compound.finance/documents/Compound.Whitepaper.pdf)
-to learn more.
+"_Kelimenin 'aşırı' anlamı, teminatın değerinin borcun değerinden daha yüksek olması gerektiğidir._ 
+_Mesela, teminat olarak kullanmak üzere 100 dolarınız var ve teminatlandırma faktörü %80 ise en fazla_
+_80 dolar borç alabilirsiniz. Ana fikir, borç vereni, borçlunun borcunu ödemezse bile, borç verenin para kaybetmemesini sağlamaktır._"
 
-1. **Utilization Ratio:** Ratio between total debt in the protocol and the total supply of the protocol.
-  
+`Havuz Tabanlı Borç Verme Protokolü` üç formüle bağlıdır. Daha fazlasını öğrenmek için [Compound Whitepaper](https://compound.finance/documents/Compound.Whitepaper.pdf)'ı kontrol edin.
+
+1. **Kullanım Oranı:** Protokoldaki toplam borç ile protokolün toplam arzı arasındaki oran.
+
    <img src="images/utilization-ratio.png" width='40%'>
 
-2. **Borrow Rate:** The current interest rate of the borrow.
+2. **Borç Faizi:** Borcun güncel faiz oranı.
 
    <img src="images/borrow-rate.png" width='40%'>
 
-3. **Exchange Rate:** Every pool in the lending protocol gives out a pool specific wrapper token. For Compound these
-are called `cTokens` and for our protocol they're called `AgToken`. `Exchange Rate` is the rate between the actual token
-and the wrapper token. Below is the formula.
+3. **Döviz Kuru:** Borç verme protokolündeki her havuz, havuza özel bir sarıcı token verir. Compound için bunlara `cToken` ve protokolümüz için `AgToken` denir. `Döviz Kuru`, gerçek token ile sarıcı token arasındaki orandır. Aşağıda formülü bulunmaktadır.
   
    <img src="images/exchange-rate.png" width='40%'>
 
-Here's an example from our blog post on how the interest rate is affected from the liquidity in the pool:
+İşte, havuzdaki likiditenin faiz oranını nasıl etkilediği hakkında blog yazımızdan bir örnek:
 
-"_For example, let's say there's $1000 of some underlying asset in a pool and also $100 of total debt lent out there._
-_At this point of the market let's also say the annual interest rate applied to loans is %x._ 
-_If someone borrows $50 more now the current market state is changed to, $950 of underlying asset liquidity and $150_ 
-_total debt out there. So, for the sake of dynamic interest rate new annual interest rate is now %y and we are sure_
-_that y > x because the underlying liquidity is now less than what it was so the price of money, interest rate,_ 
-_is now increased._"
+"_Örneğin, bir havuzda 1000 dolarlık bir alt varlık olduğunu ve ayrıca 100 dolarlık toplam borcun da olduğunu varsayalım._
+_Piyasanın bu noktasında, kredilere uygulanan yıllık faiz oranının %x olduğunu da varsayalım._ 
+_Eğer biri şimdi 50 dolar daha borç alırsa, mevcut piyasa durumu şuna dönüşür; 950 dolarlık alt varlık likiditesi ve 150 dolarlık_
+_toplam borç. Bu yüzden, dinamik faiz oranı uğruna, yeni yıllık faiz oranı şimdi %y ve biz eminiz ki_
+_y > x çünkü artık alt varlık likiditesi eskisinden daha az, yani paranın fiyatı, faiz oranı,_
+_artık artmıştır._"
 
-## Sample Use Case
-Below is a simple use case where we show how the supplier Alice makes money as the `exchange rate` increases:
+## Örnek Kullanım Senaryosu
+Aşağıda, `döviz kurunun` arttıkça tedarikçi Alice'in nasıl para kazandığını gösteren basit bir kullanım durumu bulunmaktadır:
 
 ```mermaid
 sequenceDiagram
-   actor User as Alice
+   actor Kullanıcı as Alice
    participant D as Dapp Alice
-   participant W as Wallet Alice
-   participant L as LendingPool
-   participant W1 as Wallet Bob
+   participant W as Cüzdan Alice
+   participant L as Borç Verme Havuzu
+   participant W1 as Cüzdan Bob
    participant D1 as Dapp Bob
-   actor User1 as Bob
-   User->>D: Opens the dapp page
-   User1 ->>D1: Opens dapp page
-   D->>+W: Asks for user approval
-   D1 ->>+W1: Asks for user approval
-   User->>W: Approves the dapp
-   User1->>W1: Approves the dapp
-   W-->>-D: Returns a WalletBridge object
-   W1-->>-D1: Returns a WalletBridge object
-   User->>+D: Wants to supply specified asset and amount
-   D->>W: Need approval to execute transaction
-   User->>W: Approva transaction
-   W->>L: Execute transaction with the D_OFFER
-   note over D,L: D_OFFER = {makeDepositInvitation, proposal, payment}
-   L-->>D: Success
-   User1 ->>+ W1: Wants to borrow
-   D1->>W1: Need approval to execute transaction
-   User1 ->> W1: Approve transaction
-   W1->>L: Execute transaction with the B_OFFER
-   note over D1,L: B_OFFER = {makeBorrowInvitation, proposal, payment, offerArgs}
-   L-->>D1: Success
-   L->>L: Exchange Rate increased
+   actor Kullanıcı1 as Bob
+   Kullanıcı->>D: Dapp sayfasını açar
+   Kullanıcı1 ->>D1: Dapp sayfasını açar
+   D->>+W: Kullanıcının onayını ister
+   D1 ->>+W1: Kullanıcının onayını ister
+   Kullanıcı->>W: Dapp'ı onaylar
+   Kullanıcı1->>W1: Dapp'ı onaylar
+   W-->>-D: Bir WalletBridge nesnesi döndürür
+   W1-->>-D1: Bir WalletBridge nesnesi döndürür
+   Kullanıcı->>+D: Belirtilen varlık ve miktarı tedarik etmek ister
+   D->>W: İşlemi gerçekleştirmek için onay gereklidir
+   Kullanıcı->>W: İşlemi onaylar
+   W->>L: D_TEKLİFİ ile işlemi gerçekleştirir
+   note over D,L: D_TEKLİFİ = {mevduat daveti yap, teklif, ödeme}
+   L-->>D: Başarılı
+   Kullanıcı1 ->>+ W1: Borç almak ister
+   D1->>W1: İşlemi gerçekleştirmek için onay gereklidir
+   Kullanıcı1 ->> W1: İşlemi onaylar
+   W1->>L: B_TEKLİFİ ile işlemi gerçekleştirir
+   note over D1,L: B_TEKLİFİ = {borç daveti yap, teklif, ödeme, teklifArgümanları}
+   L-->>D1: Başarılı
+   L->>L: Döviz Kuru arttı
 ```
