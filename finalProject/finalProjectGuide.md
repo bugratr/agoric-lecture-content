@@ -90,3 +90,4 @@ At the end, you should deliver a PowerPoint presentation, of maximum 20 minutes,
 - Agoric components used;
 - Live or recorded Demo;
 - Major challenges faced;
+- 
