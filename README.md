@@ -4,15 +4,15 @@ Bu depoyu, derslerimizi verdikçe ders içeriklerimizle güncelleyeceğiz.
 ## Ders Genel Bakışı
 | Ders |                                                               Konu                                                               |
 |:-------:|:-----------------------------------------------------------------------------------------------------------------------------------:|
-|    1    | [Agoric ve Sertleştirilmiş JavaScript'e Giriş](https://github.com/Chainboard-Academy/agoric-lecture-content/tree/main/lectureOne) | 
-|    2    |          [ERTP ve Zoe'ye Giriş](https://github.com/Chainboard-Academy/agoric-lecture-content/tree/main/lectureTwo)          |
-|    3    |         [Detaylı API'ler: ERTP ve Zoe](https://github.com/Chainboard-Academy/agoric-lecture-content/tree/main/lectureThree)          |
-|    4    |         [Üst Düzey Akıllı Sözleşmeler](https://github.com/Chainboard-Academy/agoric-lecture-content/tree/main/lectureFour)          |
-|    5    |            [REPL ve Yayınlama Scriptleri](https://github.com/Chainboard-Academy/agoric-lecture-content/tree/main/lectureFive)            |
-|    6    |          [Bildirimler ve Abonelikler](https://github.com/Chainboard-Academy/agoric-lecture-content/tree/main/lectureSix)           |
-|    7    |      [Çok Kullanıcılı Dapps, Ödünç Verme Protokolü](https://github.com/Chainboard-Academy/agoric-lecture-content/tree/main/lectureSeven)       |
-|    8    |      [Agoric Hazır Sözleşmeler & Fiyat Yetkilisi](https://github.com/Chainboard-Academy/agoric-lecture-content/tree/main/lectureEight)|
-|    9    |      [Ara Protokol](https://github.com/Chainboard-Academy/agoric-lecture-content/tree/main/lectureNine)                       |
+|    1    | [Agoric ve Sertleştirilmiş JavaScript'e Giriş](https://github.com/bugratr/agoric-lecture-content/tree/main/lectureOne) | 
+|    2    |          [ERTP ve Zoe'ye Giriş](https://github.com/bugratr/agoric-lecture-content/tree/main/lectureTwo)          |
+|    3    |         [Detaylı API'ler: ERTP ve Zoe](https://github.com/bugratr/agoric-lecture-content/tree/main/lectureThree)          |
+|    4    |         [Üst Düzey Akıllı Sözleşmeler](https://github.com/bugratr/agoric-lecture-content/tree/main/lectureFour)          |
+|    5    |            [REPL ve Yayınlama Scriptleri](https://github.com/bugratr/agoric-lecture-content/tree/main/lectureFive)            |
+|    6    |          [Bildirimler ve Abonelikler](https://github.com/bugratr/agoric-lecture-content/tree/main/lectureSix)           |
+|    7    |      [Çok Kullanıcılı Dapps, Ödünç Verme Protokolü](https://github.com/bugratr/agoric-lecture-content/tree/main/lectureSeven)       |
+|    8    |      [Agoric Hazır Sözleşmeler & Fiyat Yetkilisi](https://github.com/bugratr/agoric-lecture-content/tree/main/lectureEight)|
+|    9    |      [Ara Protokol](https://github.com/bugratr/agoric-lecture-content/tree/main/lectureNine)                       |
 |   10    |                                                               Genel Değerlendirme                                                               |
 
 ## Video Kayıtları
