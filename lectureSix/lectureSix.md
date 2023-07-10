@@ -1,57 +1,51 @@
-# Lecture Six - Notifiers and Subscriptions
+# Ders Altı - Bildirimciler ve Abonelikler
 
-## Table of Content
+## İçindekiler
 
-- Notifier package
-- Different conveyor of values types
-- Different tools to consume an asynchronous iteration
-  - For-await-of loop
-  - ObserveIteration adaptor
-  - ObserveIterator adaptor
-- Testing Examples
-  - Success example
-  - Promise example
-  - Local representative example
-  - Generic representative example
-  - SubscriptionIterator example
+- Bildirimci paketi
+- Değer türlerinin farklı taşıyıcıları
+- Bir asenkron iterasyonu tüketmek için farklı araçlar
+  - For-await-of döngüsü
+  - ObserveIteration uyarlayıcısı
+  - ObserveIterator uyarlayıcısı
+- Örneklerin Test Edilmesi
+  - Başarı örneği
+  - Promise örneği
+  - Yerel temsil örneği
+  - Genel temsil örneği
+  - AbonelikIterator örneği
 - makeSubscriptionKit vs makePublishKit
 - makeNotifierKit vs makeSubscriptionKit
-- User Interface (UI)
-- Storing Subscriber Data
-  - Enter vat-chainStorage
+- Kullanıcı Arayüzü (UI)
+- Abone Verilerinin Saklanması
+  - Vat zincir depolamasına girin
 
-## Notifier package
+## Bildirimci Paketi
 
-The [notifier package](https://github.com/Agoric/agoric-sdk/tree/65d3f14c8102993168d2568eed5e6acbcba0c48a/packages/notifier) "let a service notify clients of state changes. Specifically, both are abstractions for producing and consuming asynchronous value sequences. They rely on promises to deliver a stream of messages allowing many clients to receive notifications without the originator having to track a subscription list. An object wanting to publish updates to interested clients makes a notifier or a subscription available to them." - [Notifiers and Subscriptions](https://docs.agoric.com/guides/js-programming/notifiers.html)
+[notifier paketi](https://github.com/Agoric/agoric-sdk/tree/65d3f14c8102993168d2568eed5e6acbcba0c48a/packages/notifier), "bir hizmetin durum değişikliklerini istemcilere bildirmesine izin verir. Özellikle, asenkron değer dizilerinin üretilmesi ve tüketilmesi için soyutlamalardır. Bildirimci veya abonelik, ilgilenen istemcilere güncellemeleri yayınlamak isteyen bir nesne tarafından kullanılabilir hale getirilir." - [Bildirimciler ve Abonelikler](https://docs.agoric.com/guides/js-programming/notifiers.html)
 
-## Different conveyor of values types
+## Değerlerin Farklı Taşıyıcı Türleri
 
-- A **lossless conveyor** of values refers to a mechanism that ensures that all values in an asynchronous iteration are accurately and completely conveyed, without any data loss or corruption.
-  The term "lossless" indicates that no information is lost during the conveyance process, and the values are conveyed in their entirety.
-  This means that all published state, the non-final values as well as the final value, will be available at any time.
+- **Değerlerin kayıpsız taşıyıcısı**, asenkron bir iterasyondaki tüm değerlerin doğru ve eksiksiz bir şekilde iletilmesini sağlayan bir mekanizmayı ifade eder. "Kayıpsız" terimi, iletim süreci sırasında hiçbir bilginin kaybolmadığını ve değerlerin tamamının aktarıldığını gösterir. Bu, tüm yayınlanan durumun, son olmayan değerlerin yanı sıra son değerin her zaman kullanılabilir olacağı anlamına gelir.
 
-- A **lossy conveyor** of values refers to a mechanism for conveying values in an asynchronous iteration where some values may not be accurately conveyed.
-  The term "lossy" indicates that some information may be lost or discarded during the conveyance process. However, the termination or final value of the iteration is still conveyed without loss, ensuring that the receiver is aware that the iteration has been completed.
-  This means that you may miss any published state if a more recent published state can be reported instead.
+- **Değerlerin kayıplı taşıyıcısı**, asenkron bir iterasyonda değerleri ileten bir mekanizmayı ifade eder, burada bazı değerler doğru şekilde iletilmeyebilir. "Kayıplı" terimi, iletim süreci sırasında bazı bilgilerin kaybolabileceğini veya atılabileceğini gösterir. Ancak, iterasyonun sonlanması veya son değeri yine de kayıpsız iletilir, böylece alıcı iterasyonun tamamlandığını bilir. Bu, daha yeni bir yayınlanan durum varsa, önceki yayınlanan durumu kaçırabileceğiniz anlamına gelir.
 
-- A **prefix-lossy conveyor** of values requires eager consumption of the publisher so it can be completely lossless.
-  The term "prefix-lossy" refers to the fact that values published before the consumer requests an iterator may be lost, but once an iterator is obtained, the values enumerated by that iterator will be complete and accurate.
-  This means that you may miss everything published before you ask the returned iterable for an iterator. But the returned iterator will enumerate each thing published from that iterator's starting point.
+- **Önek-kayıplı taşıyıcı**, yayıncının tamamen kayıpsız olabilmesi için yayıncının hızlı tüketimini gerektirir. "Önek-kayıplı" terimi, tüketici bir yineleyici isteği yapmadan önce yayıncı tarafından yayınlanan değerlerin kaybedilebileceği anlamına gelir, ancak bir yineleyici elde edildiğinde, o yineleyici tarafından numaralandırılan değerler tam ve doğru olacaktır. Bu, döndürülen yineleyiciden önce yayınlanan her şeyi kaçırabileceğiniz anlamına gelir. Ancak, döndürülen yineleyici, o yineleyicinin başlangıç noktasından itibaren yayınlanan her şeyi numaralandıracaktır.
 
-The [SubscriptionKit](https://github.com/Agoric/agoric-sdk/blob/65d3f14c8102993168d2568eed5e6acbcba0c48a/packages/notifier/src/subscriber.js) is lossless conveyor of values; <br>
-The [NotifierKit](https://github.com/Agoric/agoric-sdk/blob/65d3f14c8102993168d2568eed5e6acbcba0c48a/packages/notifier/src/notifier.js) is a lossy conveyor of values; <br>
-The [PublishKit](https://github.com/Agoric/agoric-sdk/blob/65d3f14c8102993168d2568eed5e6acbcba0c48a/packages/notifier/src/publish-kit.js) is a prefix-lossy conveyor of values; <br>
+[SubscriptionKit](https://github.com/Agoric/agoric-sdk/blob/65d3f14c8102993168d2568eed5e6acbcba0c48a/packages/notifier/src/subscriber.js), değerlerin kayıpsız taşıyıcısıdır; <br>
+[NotifierKit](https://github.com/Agoric/agoric-sdk/blob/65d3f14c8102993168d2568eed5e6acbcba0c48a/packages/notifier/src/notifier.js), değerlerin kayıplı taşıyıcısıdır; <br>
+[PublishKit](https://github.com/Agoric/agoric-sdk/blob/65d3f14c8102993168d2568eed5e6acbcba0c48a/packages/notifier/src/publish-kit.js), değerlerin önek-kayıplı taşıyıcısıdır; <br>
 
-## Different tools to consume an asynchronous iteration
+## Asenkron bir iterasyonu tüketmek için farklı araçlar
 
-The [notifier package documentation](https://github.com/Agoric/agoric-sdk/blob/65d3f14c8102993168d2568eed5e6acbcba0c48a/packages/notifier/README.md) advises using these two different approaches to consume an asynchronous iteration:
+[notifier paketi belgeleri](https://github.com/Agoric/agoric-sdk/blob/65d3f14c8102993168d2568eed5e6acbcba0c48a/packages/notifier/README.md), bir asenkron iterasyonu tüketmek için aşağıdaki iki farklı yaklaşımı kullanmayı önerir:
 
-- the JavaScript `for-await-of` syntax
-- the `observeIteration` adaptor
-- the `observeIterator` adaptor
+- JavaScript `for-await-of` sözdizimi
+- `observeIteration` uyarlayıcısı
+- `observeIterator` uyarlayıcısı
 
-To better understand the difference between them, we are going to analyze their [source code](https://github.com/Agoric/agoric-sdk/blob/65d3f14c8102993168d2568eed5e6acbcba0c48a/packages/notifier/test/iterable-testing-tools.js).
-But first, we will require an asynchronous iteration, our `publisher`:
+Onların arasındaki farkı daha iyi anlamak için, [kaynak kodlarını](https://github.com/Agoric/agoric-sdk/blob/65d3f14c8102993168d2568eed5e6acbcba0c48a/packages/notifier/test/iterable-testing-tools.js) analiz edeceğiz.
+Ancak önce, bir asenkron iterasyonu, yani `yayıncıyı`, içereceğiz.
 
 ```js
 /**
@@ -68,7 +62,7 @@ export const paula = (iterationObserver) => {
 };
 ```
 
-The `iterationObserver` object is created using the `makeNotifierKit()` or the `makeSubscriptionKit()`, which will return an `updater` or `publication`, respectively
+`iterationObserver` nesnesi, `makeNotifierKit()` veya `makeSubscriptionKit()` kullanılarak oluşturulur ve bunlar sırasıyla bir `updater` veya `publication` döndürür.
 
 ```js
 type IterationObserver<T> = {
@@ -78,17 +72,17 @@ type IterationObserver<T> = {
 };
 ```
 
-### For-await-of loop
+### For-await-of döngüsü
 
-Consume the iteration using the `for-await-of` loop:
+İterasyonu `for-await-of` döngüsü kullanarak tüketin:
 
-- can see the non-final values and whether the iteration completes or fails.
-- can see a failure reason,
-- cannot see the completion value
+- final olmayan değerleri ve iterasyonun tamamlanıp tamamlanmadığını veya başarısız olup olmadığını görebilir.
+- başarısızlık sebebini görebilir,
+- tamamlanma değerini göremez
 
 ```js
 /**
- * See the Alice example  in the README
+ * README'deki Alice örneğine bakın
  *
  * @param {AsyncIterable<Passable>} asyncIterable
  * @returns {Promise<Passable[]>}
@@ -108,27 +102,27 @@ export const alice = async (asyncIterable) => {
 };
 ```
 
-Notice that the finish value is not pushed to the log array, only the status `finished`.
-If we print the log returned on the function above, assuming we are iterating through Paula's publisher, the result would be:
+Tamamlanma değerinin log dizisine eklenmediğini, yalnızca `finished` durumunun eklendiğini göz önünde bulundurun.
+Yukarıdaki işlevden dönen log'u yazdırırsak ve Paula'nın yayıncısını iterasyon olarak kabul edersek, sonuç şu şekilde olur:
 
 ```js
-// eventually prints
+// sonunda yazdırır
 // non-final a
 // non-final b
 // the iteration finished
 ```
 
-### ObserveIteration adaptor
+### ObserveIteration adaptörü
 
-Consume the iteration using the `observeIteration(asyncIterableP, iterationObserver)` adaptor:
+İterasyonu `observeIteration(asyncIterableP, iterationObserver)` adaptörü kullanarak tüketin:
 
-- can see the non-final values and whether the iteration completes or fails.
-- can see a failure reason,
-- can see the completion value
+- final olmayan değerleri ve iterasyonun tamamlanıp tamamlanmadığını veya başarısız olup olmadığını görebilir.
+- başarısızlık sebebini görebilir,
+- tamamlanma değerini görebilir
 
 ```js
 /**
- * See the Bob example in the README
+ * README'deki Bob örneğine bakın
  *
  * @param {ERef<AsyncIterable<Passable>>} asyncIterableP
  * @returns {Promise<Passable[]>}
@@ -145,25 +139,25 @@ export const bob = async (asyncIterableP) => {
 };
 ```
 
-When using this method we can see that the finish value (`completion`) is pushed to the log array.
-If we print the log returned on the function above, assuming we are iterating through Paula's publisher, the result would be:
+Bu metodu kullanırken tamamlanma değerinin (`completion`) log dizisine eklendiğini görebiliriz.
+Yukarıdaki işlevden dönen log'u yazdırırsak ve Paula'nın yayıncısını iterasyon olarak kabul edersek, sonuç şu şekilde olur:
 
 ```js
-// eventually prints
+// sonunda yazdırır
 // non-final a
 // non-final b
 // finished done
 ```
 
-### ObserveIterator adaptor
+### ObserveIterator adaptörü
 
-The difference between using `observeIteration` and `observeIterator` to consume an asynchronous iteration refers to the level of abstraction used to interact with the iteration. It is important to remember that the observeIterator, `carol()`, only applies to `subscriptions`.
+Bir asenkron iterasyonu tüketmek için `observeIteration` ve `observeIterator` kullanmanın arasındaki fark, iterasyonla etkileşim kurmak için kullanılan soyutlama seviyesine atıfta bulunur. ObserveIterator'ın, `carol()`, sadece `subscriptions` için geçerli olduğunu hatırlamak önemlidir.
 
-The observeIteration takes an `AsyncIterable` as an argument, which is a higher level abstraction that provides a more convenient interface for consuming an iteration. This approach is often easier to use and more convenient but may not provide as much control over the underlying iteration process.
+ObserveIteration, argüman olarak bir `AsyncIterable` alır, bu daha yüksek düzeyde bir soyutlama olup iterasyonu tüketmek için daha uygun bir arayüz sağlar. Bu yaklaşım genellikle kullanması daha kolay ve daha rahattır ancak temel iterasyon süreci üzerinde daha fazla kontrol sağlamayabilir.
 
-On the other hand, observeIterator takes an `AsyncIterator` as an argument, which is a lower-level abstraction that provides direct access to the underlying iterator. This approach provides more control over the iteration process, but may require more complex code to handle the iteration and may be less convenient to use.
+Diğer taraftan, observeIterator, argüman olarak bir `AsyncIterator` alır, bu daha düşük düzeyde bir soyutlama olup temel yineleyiciye doğrudan erişim sağlar. Bu yaklaşım, iterasyon süreci üzerinde daha fazla kontrol sağlar, ancak iterasyonu yönetmek için daha karmaşık kod gerektirebilir ve kullanması daha az rahat olabilir.
 
-Carol's approach using observeIterator directly is often used in situations where more control over the iteration process is needed, such as when implementing custom asynchronous data structures or when dealing with complex or highly optimized iteration processes.
+Carol'ün observeIterator'ı doğrudan kullanma yaklaşımı genellikle özel asenkron veri yapılarını uygularken veya karmaşık veya son derece optimize edilmiş iterasyon süreçleriyle uğraşırken, iterasyon süreci üzerinde daha fazla kontrol gerektiren durumlarda kullanılır.
 
 ```js
 /**
