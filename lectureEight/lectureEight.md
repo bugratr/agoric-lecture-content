@@ -1,44 +1,43 @@
-# Lecture Eight - Agoric pre-built contracts & Price Authority
+# Sekizinci Ders - Agoric Önceden Oluşturulmuş Sözleşmeleri & Fiyat Otoritesi
 
-## Table of Content
+## İçerik Tablosu
 
-- Pre-built contracts
-    - Funded Call Spread
-    - Simple Exchange
-- Price Authority
-    - Price Quote
-    - Price Quote Notifier
-    - Instant Price Quotes
-        - quoteGiven
-        - quoteWanted
-    - Promise Price Quote
-        - quoteWhen
-        - mutableQuoteWhen
-    - Manual Price Authority
+- Önceden oluşturulmuş sözleşmeler
+    - Finanse Edilmiş Call Spread (Opsiyonlar Stratejisi)
+    - Basit Borsa
+- Fiyat Otoritesi
+    - Fiyat Teklifi
+    - Fiyat Teklifi Bildiricisi
+    - Anlık Fiyat Teklifleri
+        - VerilenTeklif
+        - ArananTeklif
+    - Söz Verilen Fiyat Teklifi
+        - NeZamanTeklif
+        - DeğiştirilebilirNeZamanTeklif
+    - Manuel Fiyat Otoritesi
 
-## Agoric pre-built contracts
+## Agoric Önceden Oluşturulmuş Sözleşmeleri
  
-Agoric has a list list of available [Agoric pre-built contracts](https://github.com/Agoric/documentation/blob/24b31f8e49cc67d05e229992103bbecc0b2e5ead/main/guides/zoe/contracts/README.md), created to help developers building their applications. These contracts should be instantiated through a host contract, by taking advantage of Agoric `high-order` features.
-We advise you to review [Lecture four](...) for more detail on high-order contracts.
+Agoric, geliştiricilerin uygulamalarını oluştururken yardımcı olmak için oluşturulan [Agoric Önceden Oluşturulmuş Sözleşmeleri](https://github.com/Agoric/documentation/blob/24b31f8e49cc67d05e229992103bbecc0b2e5ead/main/guides/zoe/contracts/README.md) adlı bir liste sunar. Bu sözleşmeler, Agoric'in `yüksek düzeyli (high-order)` özelliklerinden yararlanarak bir ana sözleşme aracılığıyla örneklenmelidir.
+Daha fazla bilgi için [Dördüncü Ders](...)'i incelemenizi öneririz.
 
-We have selected two contracts from two different packages to demonstrate their utility and how to interact with them.
+İki farklı paketten seçtiğimiz iki sözleşme, bu sözleşmelerin işlevselliğini ve nasıl kullanılacağını göstermektedir.
 
-## Funded Call Spread
+## Finanse Edilmiş Call Spread
 
-The `fundedCallSpread` contract, from the `DeFi package`, implements a fully collateralized call spread.
-In a `call spread`, an investor buys one `call option` (referred to as the "long call") with a `lower strike price` and sells another call option (referred to as the "short call") with a `higher strike price`. The difference in the strike prices creates a `spread`, and the goal of the strategy is to profit from the difference between the two strikes. The long call provides limited upside potential, while the short call generates income and helps to offset the cost of the long call. The two options sold and bought in a call spread must have the same `expiration date`.
+`DeFi paketi`nden `finanse edilmiş call spread` sözleşmesi, tamamen teminatlandırılmış bir call spread'i uygular.
+Bir `call spread`'inde yatırımcı, `daha düşük bir kullanım fiyatı`na sahip bir `call opsiyonu` satın alır (bu "uzun call" olarak adlandırılır) ve `daha yüksek bir kullanım fiyatına` sahip başka bir call opsiyonu satar (bu "kısa call" olarak adlandırılır). Kullanım fiyatlarındaki fark, bir `spread` oluşturur ve stratejinin amacı, iki kullanım fiyatı arasındaki farktan kar etmektir. Uzun call, sınırlı bir yukarı yönlü potansiyel sağlar, kısa call ise gelir üretir ve uzun call'ın maliyetini karşılamaya yardımcı olur. Bir call spread'de satılan ve alınan iki opsiyonun aynı `vade tarihine` sahip olması gerekir.
 
-A `call option` is a financial contract that gives the holder the right, but *not* the obligation, to buy an underlying asset (such as a stock, commodity, or currency) at a specified price (strike price) within a specified time period. Call options are used as a form of investment and speculation, as well as for hedging purposes. If the price of the underlying asset rises above the strike price, the holder of the call option may choose to exercise the option and buy the asset at the lower strike price, resulting in a profit. If the price does not rise above the strike price, the option will expire worthless and the holder will lose the premium paid for the option. 
+Bir `call opsiyonu`, sahibine belirli bir fiyat (kullanım fiyatı) karşılığında belirli bir zaman dilimi içerisinde bir varlığı (örneğin bir hisse senedi, emtia veya para birimi) satın alma hakkı veren, ancak *zorunluluğu olmayan* bir finansal sözleşmedir. Call opsiyonları, yatırım ve spekülasyon formu olarak, aynı zamanda hedging (riskten korunma) amacıyla da kullanılır. Eğer dayanak varlığın fiyatı, kullanım fiyatının üzerine çıkarsa, call opsiyonunun sahibi opsiyonu kullanmayı seçebilir ve varlığı daha düşük kullanım fiyatından satın alabilir, bu da bir kar anlamına gelir. Eğer fiyat, kullanım fiyatının üzerine çıkmazsa, opsiyon değersiz hale gelir ve opsiyon için ödenen prim kaybedilir.
 
-For more detail, we advise reading the:
+Daha fazla bilgi için, aşağıdakileri okumanızı öneririz:
 
-- [Documentation](https://github.com/Agoric/documentation/blob/24b31f8e49cc67d05e229992103bbecc0b2e5ead/main/guides/zoe/contracts/fundedCallSpread.md)
-- [Contract code](https://github.com/Agoric/agoric-sdk/blob/4e0aece631d8310c7ab8ef3f46fad8981f64d208/packages/zoe/src/contracts/callSpread/fundedCallSpread.js)
-- [Contract test](https://github.com/Agoric/agoric-sdk/blob/4e0aece631d8310c7ab8ef3f46fad8981f64d208/packages/zoe/test/unitTests/contracts/test-callSpread.js)
+- [Dokümantasyon](https://github.com/Agoric/documentation/blob/24b31f8e49cc67d05e229992103bbecc0b2e5ead/main/guides/zoe/contracts/fundedCallSpread.md)
+- [Sözleşme kodu](https://github.com/Agoric/agoric-sdk/blob/4e0aece631d8310c7ab8ef3f46fad8981f64d208/packages/zoe/src/contracts/callSpread/fundedCallSpread.js)
+- [Sözleşme testi](https://github.com/Agoric/agoric-sdk/blob/4e0aece631d8310c7ab8ef3f46fad8981f64d208/packages/zoe/test/unitTests/contracts/test-callSpread.js)
 - [Call Spread video](https://www.youtube.com/watch?v=m5Pf2d1tHCs&t=3989s)
 
-Let's use the test below, [fundedCallSpread below Strike1](https://github.com/Agoric/agoric-sdk/blob/4e0aece631d8310c7ab8ef3f46fad8981f64d208/packages/zoe/test/unitTests/contracts/test-callSpread.js#L37), to exemplify how to interact with the fundedCallSpread contract.
-Assuming that you have access to the fundedCallSpread contract `installation` in your host contract, the arguments required to call the `startInstance` function are the `issuerKeywordRecord` and `terms`.
+Ana sözleşmenizde finanse edilmiş call spread sözleşmesi `kurulumu`na erişiminiz olduğunu varsayarsak, `startInstance` fonksiyonunu çağırmak için gereken argümanlar `issuerKeywordRecord` ve `terms`dir.
 
 ```js
 const { creatorInvitation } = await E(zoe).startInstance(
@@ -48,9 +47,9 @@ const { creatorInvitation } = await E(zoe).startInstance(
 );
 ```
 
-The issuerKeywordRecord will specify the `Issuer` of the `Underlying, Collateral and Strike assets`.
-The Underlying and Collateral can have the same Issuer and the Strike a different one, or you can have three different Issuers, depending on the context of your application.
-The Issuer of the `priceAuthority` of the underlying/strike pair is also included in the issuerKeywordRecord.
+IssuerKeywordRecord, `Dayanak Varlık, Teminat ve Kullanım Fiyatı varlıkları`nın `Düzenleyicisi`ni belirtir.
+Dayanak Varlık ve Teminat, aynı Düzenleyiciye sahip olabilir ve Kullanım Fiyatı farklı bir Düzenleyiciye sahip olabilir, veya uygulamanızın bağlamına bağlı olarak üç farklı Düzenleyiciye sahip olabilirsiniz.
+Dayanak varlık/kullanım fiyatı çiftinin `fiyat otoritesi`nin Düzenleyicisi de issuerKeywordRecord'a dahildir.
 
 ```js
 const issuerKeywordRecord = harden({
@@ -64,14 +63,16 @@ const issuerKeywordRecord = harden({
 });
 ```
 
-As for the `terms`, they include the:
+`issuerKeywordRecord`, `simoleanIssuer` olarak belirlenen `Underlying`, `bucksIssuer` olarak belirlenen `Collateral`, `moolaIssuer` olarak belirlenen `Strike` ve `priceAuthority`'den alınan `Quote` olmak üzere belirli `Issuer`'ları belirler.
 
-- `expiration`: time which defines when the call option can be exercised.
-- `priceAuthority`: which will issue a PriceQuote, after the deadline, giving the value of the underlying asset in the strike currency.
-- `underlyingAmount`: asset which price is being tracked.
-- `strikePrice1` and `strikePrice2`: values defined as short and long, respectively.
-- `settlementAmount`: the collateral amount deposited by the funder and split between the holders of the options.
-- `timer`: recognized by the `priceAuthority`.
+`terms` tarafına gelince, bunlar aşağıdakileri içerir:
+
+- `expiration`: Opsiyonun kullanılabilir olduğu süreyi belirler.
+- `priceAuthority`: Süre sonunda, temel varlığın değerini strike para biriminde veren bir Fiyat Teklifi çıkarır.
+- `underlyingAmount`: Takip edilen varlığın fiyatı.
+- `strikePrice1` ve `strikePrice2`: Sırasıyla kısa ve uzun olarak tanımlanan değerler.
+- `settlementAmount`: Opsiyonların sahipleri arasında bölünen ve fon sağlayıcı tarafından yatırılan teminat miktarı.
+- `timer`: `priceAuthority` tarafından tanınan zamanlayıcı.
 
 ```js
 const terms = harden({
@@ -85,8 +86,8 @@ const terms = harden({
 });
 ```
 
-The host contract, will then make an `offer` to the fundedCallSpread to get in return the two options, `LongOption` and `ShortOption`.
-To build the offer, along with the `creatorInvitation`, returned when we called the startInstance(), we also required the `Proposal` and `Payment`.
+Ev sahibi sözleşme, `LongOption` ve `ShortOption` adında iki opsiyonu geri almak için fundedCallSpread'e bir `teklif` yapar.
+Teklifi oluşturmak için, startInstance() çağrıldığında geri dönen `creatorInvitation` ile birlikte, `Proposal` ve `Payment` de gereklidir.
 
 ```js
 const aliceSeat = await E(zoe).offer(
@@ -96,8 +97,8 @@ const aliceSeat = await E(zoe).offer(
 );
 ```
 
-The creatorInvitation returns, along with the invitation for `makeFundedPairInvitation` function, a `custom object`, that can get accessed with the method `getInvitationDetails`, which is the defined options longAmount and shortAmount. 
-These values will be used in the offer proposal as the `want` property. Regarding the `give` property, it consists of the value defined as `settlementAmount` in the contract terms.
+CreatorInvitation, `makeFundedPairInvitation` fonksiyonu için davetiye ile birlikte, `getInvitationDetails` metodu ile erişilebilen bir `özel obje` döndürür. Bu obje, belirlenen uzun ve kısa miktarları içerir. 
+Bu değerler teklif teklifinde `want` özelliği olarak kullanılır. `give` özelliği söz konusu olduğunda, bu, sözleşme şartlarında `settlementAmount` olarak tanımlanan değerden oluşur.
 
 ```js
 const invitationDetail = await E(zoe).getInvitationDetails(creatorInvitation);
@@ -110,145 +111,125 @@ const aliceProposal = harden({
 });
 ```
 
-The offer `payment`, as usual, is a minted payment of the amount defined in the `give` property of the offer proposal. In this case, the call spread `collateral`.
+Teklifin `ödemesi`, genellikle, teklif teklifinin `give` özelliğinde tanımlanan miktarın basılmış ödemesidir. Bu durumda, spread çağrısının `teminatı`.
 
 ```js
 const aliceBucksPayment = bucksMint.mintPayment(bucks(300n));
 const alicePayments = { Collateral: aliceBucksPayment };
 ```
 
-When the offer is made, a payout is returned containing the two option positions.
-The positions are invitations that can be exercised for free, and provide the option payouts under the keyword Collateral.
+Teklif yapıldığında, iki opsiyon pozisyonunu içeren bir ödeme döndürülür.
+Pozisyonlar, ücretsiz olarak kullanılabilen davetiyelerdir ve Collateral anahtar kelimesi altında opsiyon ödemelerini sağlarlar.
 
 ```js
 const { LongOption, ShortOption } = await aliceSeat.getPayouts();
 ```
 
-These two invitations can be managed by your host contract, allowing you to build many different financial instruments, depending on the context of your application.
+Bu iki davetiye, ev sahibi sözleşmeniz tarafından yönetilebilir ve uygulamanızın bağlamına bağlı olarak birçok farklı finansal enstrüman oluşturmanıza olanak sağlar.
 
-## Simple Exchange
+## Basit Takas
 
-The `simpleExchange` contract, from the `Generic Sales/Trading Contracts package`, is a basic exchange for trading one asset using a second asset as its price. 
-The `order book` are two simple lists that the contract searches through for matching `selling` with `buying` orders when a new one is made. Anyone can create or fill orders, and there is a notification system to see the current list of orders.
+`simpleExchange` sözleşmesi, `Generic Sales/Trading Contracts package`'ten, ikinci bir varlığı fiyat olarak kullanarak bir varlığı ticaret için basit bir değişimdir.
+`order book`, yeni bir sipariş oluşturulduğunda eşleşen `satış` ve `alış` siparişlerini arayan iki basit liste oluşturur. Herkes sipariş oluşturabilir veya doldurabilir ve mevcut sipariş listesini görmek için bir bildirim sistemi vardır.
 
-For more detail, we advise reading the:
-
-- [documentation](https://github.com/Agoric/documentation/blob/24b31f8e49cc67d05e229992103bbecc0b2e5ead/main/guides/zoe/contracts/simple-exchange.md)
-- [Contract code](https://github.com/Agoric/agoric-sdk/blob/f29591519809dbadf19db0a26f38704d87429b89/packages/zoe/src/contracts/simpleExchange.js)
-- [Contract test](https://github.com/Agoric/agoric-sdk/blob/4e0aece631d8310c7ab8ef3f46fad8981f64d208/packages/zoe/test/unitTests/contracts/test-simpleExchange.js)
-
-Let's use the test below, [simpleExchange with valid offers](https://github.com/Agoric/agoric-sdk/blob/4e0aece631d8310c7ab8ef3f46fad8981f64d208/packages/zoe/test/unitTests/contracts/test-simpleExchange.js#L20), to exemplify how to interact with the simpleExchange contract.
-Unlike the fundedCallSpread contract, the simpleExchange requires no terms as an argument for the `startIntance` function, regarding the `issuerKeyword`, they are `Asset` and `Price`.
+Daha fazla ayrıntı için, şunları okumanızı öneririz:
 
 ```js
-const { publicFacet, instance } = await E(zoe).startInstance(installation, {
-  Asset: moolaIssuer,
-  Price: simoleanIssuer,
+const issuerKeywordRecord = harden({
+  Underlying: simoleanIssuer,
+  Collateral: bucksIssuer,
+  Strike: moolaIssuer,
+  Quote: await E(priceAuthority).getQuoteIssuer(
+    brands.get("simoleans"),
+    brands.get("moola")
+  ),
 });
 ```
 
-When called the starInstance, it will return the SimpleExchange contract `publicFacet` and `instance`.
-The publicFacet exposes two functions:
-- makeInvitation: makeExchangeInvitation,
-- getNotifier: () => notifier
+`issuerKeywordRecord`, `simoleanIssuer` olarak belirlenen `Underlying`, `bucksIssuer` olarak belirlenen `Collateral`, `moolaIssuer` olarak belirlenen `Strike` ve `priceAuthority`'den alınan `Quote` olmak üzere belirli `Issuer`'ları belirler.
 
-By calling the `makeInvitation()`, the host contract can access the `aliceInvitation`, required to build the offer.
+`terms` tarafına gelince, bunlar aşağıdakileri içerir:
+
+- `expiration`: Opsiyonun kullanılabilir olduğu süreyi belirler.
+- `priceAuthority`: Süre sonunda, temel varlığın değerini strike para biriminde veren bir Fiyat Teklifi çıkarır.
+- `underlyingAmount`: Takip edilen varlığın fiyatı.
+- `strikePrice1` ve `strikePrice2`: Sırasıyla kısa ve uzun olarak tanımlanan değerler.
+- `settlementAmount`: Opsiyonların sahipleri arasında bölünen ve fon sağlayıcı tarafından yatırılan teminat miktarı.
+- `timer`: `priceAuthority` tarafından tanınan zamanlayıcı.
+
+```js
+const terms = harden({
+  expiration: 2n,
+  underlyingAmount: simoleans(2n),
+  priceAuthority,
+  strikePrice1: moola(60n),
+  strikePrice2: moola(100n),
+  settlementAmount: bucks(300n),
+  timer: manualTimer,
+});
+```
+
+Ev sahibi sözleşme, `LongOption` ve `ShortOption` adında iki opsiyonu geri almak için fundedCallSpread'e bir `teklif` yapar.
+Teklifi oluşturmak için, startInstance() çağrıldığında geri dönen `creatorInvitation` ile birlikte, `Proposal` ve `Payment` de gereklidir.
 
 ```js
 const aliceSeat = await E(zoe).offer(
-  aliceInvitation,
-  aliceSellOrderProposal,
+  creatorInvitation,
+  aliceProposal,
   alicePayments
 );
 ```
 
-If we want to build a `sell offer`, the give property will specify the `Asset` we are willing to sell and the want property will have the `Price` we want in return.
-The `payment` will be the respective amount of the Asset described in the proposal.
+CreatorInvitation, `makeFundedPairInvitation` fonksiyonu için davetiye ile birlikte, `getInvitationDetails` metodu ile erişilebilen bir `özel obje` döndürür. Bu obje, belirlenen uzun ve kısa miktarları içerir. 
+Bu değerler teklif teklifinde `want` özelliği olarak kullanılır. `give` özelliği söz konusu olduğunda, bu, sözleşme şartlarında `settlementAmount` olarak tanımlanan değerden oluşur.
 
 ```js
-const aliceSellOrderProposal = harden({
-  give: { Asset: moola(3n) },
-  want: { Price: simoleans(4n) },
-  exit: { onDemand: null },
+const invitationDetail = await E(zoe).getInvitationDetails(creatorInvitation);
+const longOptionAmount = invitationDetail.longAmount;
+const shortOptionAmount = invitationDetail.shortAmount;
+
+const aliceProposal = harden({
+  want: { LongOption: longOptionAmount, ShortOption: shortOptionAmount },
+  give: { Collateral: bucks(300n) },
 });
-const alicePayments = { Asset: aliceMoolaPayment };
 ```
 
-If you wish to make a `buy offer`, the structure of the proposal will be the `opposite` of the above, meaning that the give and want would have the Price and Asset respectably.
+Teklifin `ödemesi`, genellikle, teklif teklifinin `give` özelliğinde tanımlanan miktarın basılmış ödemesidir. Bu durumda, spread çağrısının `teminatı`.
 
 ```js
-const bobBuyOrderProposal = harden({
-  give: { Price: simoleans(7n) },
-  want: { Asset: moola(3n) },
-  exit: { onDemand: null },
-});
-const bobPayments = { Price: bobSimoleanPayment };
+const aliceBucksPayment = bucksMint.mintPayment(bucks(300n));
+const alicePayments = { Collateral: aliceBucksPayment };
 ```
 
-The `getNotifier` method of the publicFacet returns a notifier with two attributes, a `value` and a `updateCount`.
-The value has two arrays, a list of buy offers and a list of sell offers.
-It is updated every time a new offer is made or two offers match.
+Teklif yapıldığında, iki opsiyon pozisyonunu içeren bir ödeme döndürülür.
+Pozisyonlar, ücretsiz olarak kullanılabilen davetiyelerdir ve Collateral anahtar kelimesi altında opsiyon ödemelerini sağlarlar.
 
 ```js
-  const part1 = E(aliceNotifier)
-    .getUpdateSince()
-    .then(({ value: afterAliceOrders, updateCount: afterAliceCount }) => {
-      t.deepEqual(
-        afterAliceOrders,
-        {
-          buys: [],
-          sells: [
-            {
-              want: aliceSellOrderProposal.want,
-              give: aliceSellOrderProposal.give,
-            },
-          ],
-        },
-        `order notifier is updated with Alice's sell order`,
-      );
+const { LongOption, ShortOption } = await aliceSeat.getPayouts();
 ```
 
-This contract can be useful if you wish to implement a simple logic for allowing the contract users to trade assets, although it is important to remember that there are more optimized ways to do it, like an [auction](https://github.com/Agoric/documentation/blob/24b31f8e49cc67d05e229992103bbecc0b2e5ead/main/guides/zoe/contracts/second-price-auction.md) for example.
+Bu iki davetiye, ev sahibi sözleşmeniz tarafından yönetilebilir ve uygulamanızın bağlamına bağlı olarak birçok farklı finansal enstrüman oluşturmanıza olanak sağlar.
 
+## Basit Takas
 
-## Price Authority
+`simpleExchange` sözleşmesi, `Generic Sales/Trading Contracts package`'ten, ikinci bir varlığı fiyat olarak kullanarak bir varlığı ticaret için basit bir değişimdir.
+`order book`, yeni bir sipariş oluşturulduğunda eşleşen `satış` ve `alış` siparişlerini arayan iki basit liste oluşturur. Herkes sipariş oluşturabilir veya doldurabilir ve mevcut sipariş listesini görmek için bir bildirim sistemi vardır.
 
-A `PriceAuthority` is an object that mints `PriceQuotes` and handles triggers and notifiers for changes in the price.
-
-## Price Quote
-
-A price quote is the price of one asset in comparison with another asset. These quotes always involve asset pairs because you are buying one by selling another. For example, the price of 1 Euro may cost 1.2 Dollar when viewing the EUR/USD currency pair.
-
-A [PriceQuote](https://github.com/Agoric/agoric-sdk/blob/b36fcb2d832ec154019cb6ae0a5dda17f94207eb/packages/zoe/src/contractSupport/priceQuote.js) in Agoric context is an object with two properties:
-
-- `quoteAmount`: An `Amount` whose value is a `PriceQuoteValue`.
-- `quotePayment`: The `quoteAmount` wrapped as a `Payment`. It is either an `ERef<Payment>` or `null`.
-
-The `quoteAmount` describes a price available at a particular time. So that price can be shared by recipients with others, its associated `quotePayment` is the same value wrapped as a payment from the `QuoteIssuer`.
-
-A `PriceQuoteValue` is the `Value` part of a `quoteAmount`. Its properties are:
-
-- `amountIn` `{ Amount }`: The amount supplied to a trade
-- `amountOut` `{ Amount }`: The quoted result of trading `amountIn`
-- `timer` `{ TimerService }`: The service that gave the `timestamp`
-- `timestamp` `{ Timestamp }`: A timestamp according to `timer` for the quote
-- `conditions` `{ any= }`: Additional conditions for the quote
-
-For more detail, see:
+Daha fazla ayrıntı için, şunları okumanızı öneririz:
 
 - [PriceAuthority Zoe documentation](https://github.com/Agoric/documentation/blob/main/main/guides/zoe/price-authority.md)
 - [PriceAuthority REPL documentation](https://github.com/Agoric/documentation/blob/main/main/guides/zoe/price-authority.md)
 - [PriceAuthority Methods](https://github.com/Agoric/documentation/blob/main/main/reference/zoe-api/contract-support/price-authority.md)
 
-## Price Quote Notifier
+## Fiyat Teklifi Bildirimi
 
-The [makeQuoteNotifier](https://github.com/Agoric/agoric-sdk/blob/b36fcb2d832ec154019cb6ae0a5dda17f94207eb/packages/zoe/src/contractSupport/priceAuthority.js#L244) function creates a `quote notifier` which wraps an underlying notifier. The purpose of the quote notifier is to provide a stream of price quotes, of the ratio between two assets, that are updated over time.
+[makeQuoteNotifier](https://github.com/Agoric/agoric-sdk/blob/b36fcb2d832ec154019cb6ae0a5dda17f94207eb/packages/zoe/src/contractSupport/priceAuthority.js#L244) fonksiyonu, altta yatan bir bildiriciyi kapsayan bir `quote bildirici` oluşturur. Quote bildiricinin amacı, iki varlık arasındaki oranın fiyat tekliflerinin zamanla güncellenen bir akışını sağlamaktır.
 
-The makeQuoteNotifier() takes two parameters: `amountIn` and `brandOut`. The amountIn brand and brandOut are checked to ensure that the pair is supported by using the assertBrands function.
+MakeQuoteNotifier() iki parametre alır: `amountIn` ve `brandOut`. AmountIn markası ve brandOut, assertBrands fonksiyonunu kullanarak desteklenen çiftin kontrol edilmesi için kontrol edilir.
 
-The `getUpdateSince` method of the underlying notifier is then overridden to generate a new "quote" each time the method is called. The quote is created using the `createQuote` function and passed to the quote constant. The method returns a new record containing the value of the quote and the updated count.
+Daha sonra, altta yatan bildiricinin `getUpdateSince` metodu, metot her çağrıldığında yeni bir "teklif" oluşturacak şekilde geçersiz kılınır. Teklif, `createQuote` fonksiyonunu kullanarak oluşturulur ve teklif sabitine geçirilir. Metot, teklifin değerini ve güncellenmiş sayıyı içeren yeni bir kayıt döndürür.
 
-Finally, a new notifier object is created and returned, with methods and properties of `specificBaseNotifier`.
+Son olarak, yeni bir bildirici objesi oluşturulur ve `specificBaseNotifier`'ın metotları ve özellikleri ile birlikte döndürülür.
 
 ```js
 makeQuoteNotifier(amountIn, brandOut) {
@@ -286,10 +267,9 @@ makeQuoteNotifier(amountIn, brandOut) {
     }
 ```
 
-The test below, [scaled price authority](https://github.com/Agoric/agoric-sdk/blob/b36fcb2d832ec154019cb6ae0a5dda17f94207eb/packages/zoe/test/unitTests/contracts/test-scaledPriceAuthority.js#L44), demonstrate how to use the makeQuoteNotifier method.
-By calling the method getUpdateSince of the notifier object, returned by the makeQuoteNotifier, it will return a promise with the updated quote record and the updated count.
+Aşağıdaki test, [scaled price authority](https://github.com/Agoric/agoric-sdk/blob/b36fcb2d832ec154019cb6ae0a5dda17f94207eb/packages/zoe/test/unitTests/contracts/test-scaledPriceAuthority.js#L44), makeQuoteNotifier metodunun nasıl kullanılacağını göstermektedir.
+MakeQuoteNotifier tarafından döndürülen bildirici nesnesinin getUpdateSince metodunu çağırarak, güncellenmiş teklif kaydı ve güncellenmiş sayı ile bir promise döndürecektir.
 
-```js
 test('scaled price authority', /** @param {ExecutionContext} t */ async t => {
 
     ...
@@ -316,63 +296,13 @@ test('scaled price authority', /** @param {ExecutionContext} t */ async t => {
   ...
 
 });
-```
 
-## Instant Price Quotes
-
-There are two methods to get an instant quote from the priceAuthority, being them the `quoteGiven` and `quoteWanted`.
-
-### quoteGiven
-
-The [quoteGiven](https://github.com/Agoric/agoric-sdk/blob/b36fcb2d832ec154019cb6ae0a5dda17f94207eb/packages/zoe/src/contractSupport/priceAuthority.js#L277) is an asynchronous function that takes two arguments, `amountIn` and `brandOut`.
-This method waits for an update from the notifier and then creates a price quote by calling createQuote with a callback function. The callback takes a `calcAmountOut` function as an argument and returns an object that includes amountIn and amountOut, which is calculated by calling calcAmountOut with amountIn as its argument.
-Finally, the function asserts that the quote exists and returns it.
-
-```js
-    async quoteGiven(amountIn, brandOut) {
-      AmountMath.coerce(actualBrandIn, amountIn);
-      assertBrands(amountIn.brand, brandOut);
-
-      await E(notifier).getUpdateSince();
-      const quote = createQuote(calcAmountOut => ({
-        amountIn,
-        amountOut: calcAmountOut(amountIn),
-      }));
-      assert(quote);
-      return quote;
-    },
-```
-
-The test below, [priceAuthority quoteGiven](https://github.com/Agoric/agoric-sdk/blob/b36fcb2d832ec154019cb6ae0a5dda17f94207eb/packages/zoe/test/unitTests/test-fakePriceAuthority.js#L54), demonstrate how to use the quoteGiven method.
-The `priceAuthority` is created using the [makeTestPriceAuthority](https://github.com/Agoric/agoric-sdk/blob/b36fcb2d832ec154019cb6ae0a5dda17f94207eb/packages/zoe/test/unitTests/test-fakePriceAuthority.js#L20) function, that will invoke the `makeFakePriceAuthority` with the arguments passed to makeTestPriceAuthority.
-By providing the amountIn, _moola(37n)_, and the brandOut ,_bucksBrand_, the quoteGiven method will return a quote.
-The quote amount can be accessed using the `getPriceDescription`function.
-
-```js
-test("priceAuthority quoteGiven", async (t) => {
-  const { moola, brands, bucks } = setup();
-  const bucksBrand = brands.get("bucks");
-  assert(bucksBrand);
-  const manualTimer = buildManualTimer(t.log, 0n, { eventLoopIteration });
-  const priceAuthority = await makeTestPriceAuthority(
-    brands,
-    [20, 55],
-    manualTimer
-  );
-
-  await E(manualTimer).tick();
-  const quote = await E(priceAuthority).quoteGiven(moola(37n), bucksBrand);
-  const quoteAmount = getPriceDescription(quote);
-  t.is(1n, TimeMath.absValue(quoteAmount.timestamp));
-  t.deepEqual(bucks(37n * 20n), quoteAmount.amountOut);
-});
-```
 
 ### quoteWanted
 
-The [quoteWanted](https://github.com/Agoric/agoric-sdk/blob/b36fcb2d832ec154019cb6ae0a5dda17f94207eb/packages/zoe/src/contractSupport/priceAuthority.js#L289)function calculates a price quote for a given `brandIn` and `amountOut`.
-This function is similar with the function above, except that function createQuote takes two parameters `calcAmountOut` and `calcAmountIn`. The callback function uses calcAmountIn to determine an amountIn value that guarantees a minimum amountOut, and then uses calcAmountOut to calculate the actual amountOut for the given amountIn.
-The function returns the price quote with both amountIn and amountOut.
+[quoteWanted](https://github.com/Agoric/agoric-sdk/blob/b36fcb2d832ec154019cb6ae0a5dda17f94207eb/packages/zoe/src/contractSupport/priceAuthority.js#L289) fonksiyonu, verilen bir `brandIn` ve `amountOut` için fiyat teklifi hesaplar.
+Bu fonksiyon, yukarıdaki fonksiyonla benzerdir, tek fark, createQuote fonksiyonunun iki parametre `calcAmountOut` ve `calcAmountIn` almasıdır. Geri çağırma fonksiyonu, minimum bir amountOut garantileyen bir amountIn değerini belirlemek için calcAmountIn'i kullanır ve ardından verilen amountIn için gerçek amountOut'u hesaplamak için calcAmountOut'u kullanır.
+Fonksiyon, hem amountIn hem de amountOut ile fiyat teklifini döndürür.
 
 ```js
     async quoteWanted(brandIn, amountOut) {
@@ -381,12 +311,12 @@ The function returns the price quote with both amountIn and amountOut.
 
       await E(notifier).getUpdateSince();
       const quote = createQuote((calcAmountOut, calcAmountIn) => {
-        // We need to determine an amountIn that guarantees at least the amountOut.
+        // En az amountOut garantileyen bir amountIn belirlememiz gerekiyor.
         const amountIn = calcAmountIn(amountOut);
         const actualAmountOut = calcAmountOut(amountIn);
         AmountMath.isGTE(actualAmountOut, amountOut) ||
           assert.fail(
-            X`Calculation of ${actualAmountOut} didn't cover expected ${amountOut}`,
+            X`Hesaplama olan ${actualAmountOut}, beklenen ${amountOut}'u karşılamadı`,
           );
         return { amountIn, amountOut };
       });
@@ -395,9 +325,9 @@ The function returns the price quote with both amountIn and amountOut.
     },
 ```
 
-The test below, [priceAuthority quoteWanted](https://github.com/Agoric/agoric-sdk/blob/b36fcb2d832ec154019cb6ae0a5dda17f94207eb/packages/zoe/test/unitTests/test-fakePriceAuthority.js#L72), demonstrate how to use the quoteWanted method.
-By providing the brandIn, _moolaBrand_, and the amountOut, _bucks(400n)_, it will return the expected quote.
-In this example, the quote amount is accessed by using its attribute `quote.quoteAmount.value[0]`.
+Aşağıdaki test, [priceAuthority quoteWanted](https://github.com/Agoric/agoric-sdk/blob/b36fcb2d832ec154019cb6ae0a5dda17f94207eb/packages/zoe/test/unitTests/test-fakePriceAuthority.js#L72), quoteWanted metodunu nasıl kullanılacağını gösterir.
+BrandIn olarak _moolaBrand_ ve amountOut olarak _bucks(400n)_ verilerek beklenen teklif döndürülür.
+Bu örnekte, teklif miktarı `quote.quoteAmount.value[0]` özelliği kullanılarak erişilir.
 
 ```js
 test("priceAuthority quoteWanted", async (t) => {
@@ -420,10 +350,10 @@ test("priceAuthority quoteWanted", async (t) => {
 });
 ```
 
-## Promise Price Quote
+## Promise Fiyat Teklifi
 
-There are a few [methods](https://github.com/Agoric/agoric-sdk/blob/b36fcb2d832ec154019cb6ae0a5dda17f94207eb/packages/zoe/src/contractSupport/priceAuthority.js#L339) of `priceAuthority` that returns a `promise` that will be resolved when certain conditions, specified by the developer, are achieved.
-Those methods are:
+`priceAuthority`'nin belirli koşulların, geliştirici tarafından belirlenen, gerçekleştiğinde çözülecek bir `promise` döndüren birkaç [metodu](https://github.com/Agoric/agoric-sdk/blob/b36fcb2d832ec154019cb6ae0a5dda17f94207eb/packages/zoe/src/contractSupport/priceAuthority.js#L339) vardır.
+Bu metodlar:
 
 ```js
     quoteWhenLT: makeQuoteWhenOut(isLT),
@@ -436,7 +366,7 @@ Those methods are:
     mutableQuoteWhenGTE: makeMutableQuote(isGTE),
 ```
 
-The parameters expected by the methods above, called `compareAmountsFn`, are created using the AmounthMath library. It is this parameter that will define the condition for the respective promise.
+Yukarıdaki metodlar tarafından beklenen parametreler, `compareAmountsFn` olarak adlandırılan, AmountMath kütüphanesi kullanılarak oluşturulur. İlgili promise için koşulu bu parametre belirler.
 
 ```js
 /**
@@ -461,21 +391,23 @@ const isGT = (amount, amountLimit) => !AmountMath.isGTE(amountLimit, amount);
 
 ### quoteWhen
 
-The [makeQuoteWhenOut](https://github.com/Agoric/agoric-sdk/blob/b36fcb2d832ec154019cb6ae0a5dda17f94207eb/packages/zoe/src/contractSupport/priceAuthority.js#L85) function takes in a `compareAmountsFn` and returns an inner function `quoteWhenOutTrigger`. The inner function is an asynchronous function that takes in two arguments, `amountIn` and `amountOutLimit`.
+[makeQuoteWhenOut](https://github.com/Agoric/agoric-sdk/blob/b36fcb2d832ec154019cb6ae0a5dda17f94207eb/packages/zoe/src/contractSupport/priceAuthority.js#L85) fonksiyonu bir `compareAmountsFn` alır ve bir iç fonksiyon olan `quoteWhenOutTrigger`'ı döndürür. İç fonksiyon, `amountIn` ve `amountOutLimit` olmak üzere iki argüman alan asenkron bir fonksiyondur.
 
-The function creates a Promise object `triggerPK` using `makePromiseKit`. It then creates an asynchronous function `trigger` that takes in `createInstantQuote`. This function tries to generate a quote based on createInstantQuote and calcAmountOut:
+Fonksiyon, `makePromiseKit` kullanarak bir Promise objesi `triggerPK` oluşturur. Ardından `createInstantQuote` alarak bir `trigger` adlı asenkron bir fonksiyon oluşturur. Bu fonksiyon, createInstantQuote ve calcAmountOut'a dayanarak bir teklif oluşturmaya çalışır:
 
-- If the triggers set does not contain the trigger, it immediately returns undefined because the trigger has already been fired.
-- If compareAmountsFn returns false when passed calcAmountOut(amountIn) and amountOutLimit, it returns undefined because the trigger should not fire yet.
-- If compareAmountsFn returns true, the function generates a quote by returning an object with properties amountIn and amountOut.
-- If the returned value of createInstantQuote is null, it returns undefined.
-- If an exception is thrown in the try block, the trigger promise is rejected, and the trigger is deleted from the triggers set.
+- Eğer tetikleyiciler seti tetikleyiciyi içermiyorsa, tetikleyici zaten ateşlendiği için hemen undefined döndürür.
+- Eğer compareAmountsFn, calcAmountOut(amountIn) ve amountOutLimit geçildiğinde false dönerse, tetikleyici henüz ateşlememeli çünkü undefined döner.
+- Eğer compareAmountsFn true dönerse, fonksiyon, amountIn ve amountOut özelliklerine sahip bir obje döndürerek bir teklif oluştur.
 
-Finally, the trigger is added to the triggers set, and the trigger function is executed immediately with createQuote as its argument. The function will then return the Promise object triggerPK.
+- Eğer compareAmountsFn doğru dönerse, işlev, amountIn ve amountOut özelliklerine sahip bir nesne döndürerek bir teklif oluşturur.
+- Eğer createInstantQuote'nun döndürdüğü değer null ise, undefined döndürür.
+- Eğer try bloğunda bir istisna atılırsa, tetikleyici vaadi reddedilir ve tetikleyici, tetikleyiciler kümesinden silinir.
 
-The test below, [priceAuthority quoteWhenLT](https://github.com/Agoric/agoric-sdk/blob/b36fcb2d832ec154019cb6ae0a5dda17f94207eb/packages/zoe/test/unitTests/test-fakePriceAuthority.js#L146), demonstrate how to use the `quoteWhenLT` method.
-By providing the amountIn (moola(1n)) and the amountOutLimit (bucks(30n)) it will return promise of a PriceQuote.
-The time will than be moved forward (await E(manualTimer).tick()) until the condition triggers.
+Sonunda, tetikleyici tetikleyiciler kümesine eklenir ve tetikleyici fonksiyonu, argümanı olarak createQuote ile hemen çalıştırılır. İşlev daha sonra Promise nesnesi olan triggerPK'yi döndürecektir.
+
+Aşağıdaki test, [priceAuthority quoteWhenLT](https://github.com/Agoric/agoric-sdk/blob/b36fcb2d832ec154019cb6ae0a5dda17f94207eb/packages/zoe/test/unitTests/test-fakePriceAuthority.js#L146), `quoteWhenLT` metodunun nasıl kullanılacağını gösterir.
+AmountIn (moola(1n)) ve amountOutLimit (bucks(30n)) sağlayarak, bir PriceQuote vaadi döndürecektir.
+Zaman, koşul tetiklenene kadar ileriye taşınacaktır (await E(manualTimer).tick()).
 
 ```js
 test("priceAuthority quoteWhenLT", async (t) => {
@@ -507,20 +439,20 @@ test("priceAuthority quoteWhenLT", async (t) => {
 
 ### mutableQuoteWhen
 
-The [makeMutableQuote](https://github.com/Agoric/agoric-sdk/blob/b36fcb2d832ec154019cb6ae0a5dda17f94207eb/packages/zoe/src/contractSupport/priceAuthority.js#L146) function is very similar with the function above, except that when called, it returns a new function `mutableQuoteWhenOutTrigger` which will return an object, `mutableQuote`.
+[makeMutableQuote](https://github.com/Agoric/agoric-sdk/blob/b36fcb2d832ec154019cb6ae0a5dda17f94207eb/packages/zoe/src/contractSupport/priceAuthority.js#L146) fonksiyonu, yukarıdaki işlevle çok benzer, ancak çağrıldığında, `mutableQuoteWhenOutTrigger` adında yeni bir işlev döndürür, bu da bir `mutableQuote` nesnesi döndürür.
 
-The mutableQuote object is created with three methods: `cancel`, `updateLevel`, and `getPromise`:
+MutableQuote nesnesi, üç metodla oluşturulur: `cancel`, `updateLevel`, ve `getPromise`:
 
-- The cancel method is used to reject the promise associated with mutableQuote.
-- The updateLevel method is used to change the amountIn and amountOutLimit values and re-fire the trigger.
-- The getPromise method returns the promise associated with mutableQuote.
+- Cancel metodunu, mutableQuote ile ilişkilendirilmiş vaadi reddetmek için kullanılır.
+- UpdateLevel metodunu, amountIn ve amountOutLimit değerlerini değiştirmek ve tetikleyiciyi yeniden ateşlemek için kullanılır.
+- GetPromise metodunu, mutableQuote ile ilişkilendirilmiş vaadi döndürmek için kullanılır.
 
-The test below, [temutableQuoteWhenLT: brands in/out matchst](https://github.com/Agoric/agoric-sdk/blob/b36fcb2d832ec154019cb6ae0a5dda17f94207eb/packages/zoe/test/unitTests/contracts/test-scaledPriceAuthority.js#L178), demonstrate how to use the `mutableQuoteWhenLT` method.
-By providing the amountIn, _AmountMath.make(t.context.ibcAtom.brand, 10n \*\* 6n)_, and the amountOutLimit, _AmountMath.make(t.context.ibcAtom.brand, 10n \*\* 6n)_, it will return promise of a MutableQuote.
-The time will than be moved forward, _await E(timer).tick()_, allowing the condition to trigger.
+Aşağıdaki test, [temutableQuoteWhenLT: brands in/out matchst](https://github.com/Agoric/agoric-sdk/blob/b36fcb2d832ec154019cb6ae0a5dda17f94207eb/packages/zoe/test/unitTests/contracts/test-scaledPriceAuthority.js#L178), `mutableQuoteWhenLT` metodunun nasıl kullanılacağını gösterir.
+AmountIn'i, _AmountMath.make(t.context.ibcAtom.brand, 10n \*\* 6n)_, ve amountOutLimit'i, _AmountMath.make(t.context.ibcAtom.brand, 10n \*\* 6n)_, sağlayarak, bir MutableQuote vaadi döndürecektir.
+Zaman, _await E(timer).tick()_ kullanılarak ileriye taşınacak, bu da koşulun tetiklenmesine izin verecektir.
 
 ```js
-test("mutableQuoteWhenLT: brands in/out match", /** @param {ExecutionContext} t */ async (t) => {
+test("mutableQuoteWhenLT: markalar giriş/çıkışta eşleşiyor", /** @param {ExecutionContext} t */ async (t) => {
   const timer = buildManualTimer(t.log);
   const makeSourcePrice = (valueIn, valueOut) =>
     makeRatio(valueOut, t.context.usdBrand, valueIn, t.context.atomBrand);
@@ -587,7 +519,7 @@ test("mutableQuoteWhenLT: brands in/out match", /** @param {ExecutionContext} t 
     },
   ]);
 
-  // check source quote
+  // kaynak fiyat teklifini kontrol et
   const {
     value: { quoteAmount: sqa2 },
   } = await E(sourceNotifier).getUpdateSince(suc1);
@@ -602,23 +534,23 @@ test("mutableQuoteWhenLT: brands in/out match", /** @param {ExecutionContext} t 
 });
 ```
 
-For other examples we recommend seeing the following tests:
+Diğer örnekler için aşağıdaki testlere göz atmanızı öneririz:
 
-- [mutableQuoteWhen with update](https://github.com/Agoric/agoric-sdk/blob/b36fcb2d832ec154019cb6ae0a5dda17f94207eb/packages/zoe/test/unitTests/contracts/test-priceAggregator.js#L946)
-- [cancel mutableQuoteWhen](https://github.com/Agoric/agoric-sdk/blob/b36fcb2d832ec154019cb6ae0a5dda17f94207eb/packages/zoe/test/unitTests/contracts/test-priceAggregator.js#L1020)
+- [güncelleme ile mutableQuoteWhen](https://github.com/Agoric/agoric-sdk/blob/b36fcb2d832ec154019cb6ae0a5dda17f94207eb/packages/zoe/test/unitTests/contracts/test-priceAggregator.js#L946)
+- [mutableQuoteWhen'i iptal et](https://github.com/Agoric/agoric-sdk/blob/b36fcb2d832ec154019cb6ae0a5dda17f94207eb/packages/zoe/test/unitTests/contracts/test-priceAggregator.js#L1020)
 
-The main difference between the two functions `makeQuoteWhenOut` and `makeMutableQuote` is that makeQuoteWhenOut creates a function quoteWhenOutTrigger that returns a promise that is resolved with a quote when a certain condition is met, whereas makeMutableQuote creates a function mutableQuoteWhenOutTrigger that returns a mutable quote, which can be updated and canceled.
+`makeQuoteWhenOut` ve `makeMutableQuote` işlevleri arasındaki ana fark, `makeQuoteWhenOut`'un belirli bir koşul yerine getirildiğinde bir teklifle çözülen bir söz veren `quoteWhenOutTrigger` işlevi oluşturmasıdır, buna karşın `makeMutableQuote` bir `mutableQuoteWhenOutTrigger` işlevi oluşturur ki bu da güncellenebilen ve iptal edilebilen bir mutable teklif verir.
 
-## Manual Price Authority
+## Manuel Fiyat Otoritesi
 
-The [makeManualPriceAuthority](https://github.com/Agoric/agoric-sdk/blob/b36fcb2d832ec154019cb6ae0a5dda17f94207eb/packages/zoe/tools/manualPriceAuthority.js) function returns an object that represents a manual price authority, which creates and returns an object that implements the `PriceAuthority` interface, with the following additional method:
+[makeManualPriceAuthority](https://github.com/Agoric/agoric-sdk/blob/b36fcb2d832ec154019cb6ae0a5dda17f94207eb/packages/zoe/tools/manualPriceAuthority.js) işlevi, `PriceAuthority` arabirimini uygulayan ve geri dönen bir nesne oluşturan ve döndüren bir manuel fiyat otoritesini temsil eden bir nesne döndürür, aşağıdaki ek yöntemle:
 
-- setPrice: a function that allows changing the current price of the asset ratio requested.
+- setPrice: talep edilen varlık oranının mevcut fiyatını değiştirmeyi sağlayan bir işlev.
 
-The `createQuote` function creates a price quote for the current price. The quote is authenticated using the `authenticateQuote` function which takes a quote as an argument, converts it to a payment using the `quoteMint` and returns the `quote payment` and the `quote amount`. The `calcAmountOut` and `calcAmountIn` functions calculate the output and input amounts, respectively, based on the current price.
+`createQuote` işlevi, mevcut fiyat için bir fiyat teklifi oluşturur. Teklif, bir teklifi alarak `quoteMint` kullanarak ödemeye dönüştüren ve `quote payment` ve `quote amount` döndüren `authenticateQuote` işlevi kullanılarak doğrulanır. `calcAmountOut` ve `calcAmountIn` işlevleri, mevcut fiyata dayalı olarak çıktı ve giriş miktarlarını hesaplar.
 
-Finally, a priceAuthority object is created using the `makeOnewayPriceAuthorityKit` utility, which takes the `priceAuthorityOptions` object that contains the timer, the createQuote function, the input and output brands, the quote issuer, and the notifier.
-The priceAuthority is returned, along with the setPrice method.
+Son olarak, timer, createQuote işlevi, giriş ve çıkış markaları, teklif veren ve bildiriciyi içeren `priceAuthorityOptions` nesnesini alan `makeOnewayPriceAuthorityKit` yardımcı programı kullanılarak bir priceAuthority nesnesi oluşturulur.
+PriceAuthority, setPrice yöntemiyle birlikte döndürülür.
 
 ```js
 /**
@@ -645,7 +577,7 @@ export function makeManualPriceAuthority(options) {
 
   function createQuote(priceQuery) {
     const quote = priceQuery(calcAmountOut, calcAmountIn);
-    if (!quote) {
+    if (!quote)
       return undefined;
     }
 
@@ -683,8 +615,7 @@ export function makeManualPriceAuthority(options) {
 }
 ```
 
-The test below, [scaled price authority](https://github.com/Agoric/agoric-sdk/blob/b36fcb2d832ec154019cb6ae0a5dda17f94207eb/packages/zoe/test/unitTests/contracts/test-scaledPriceAuthority.js#L83), demonstrate how to use the `makeManualPriceAuthority` function.
-The makeManualPriceAuthority() will return a manualPriceAuthority, `sourcePriceAuthority`, that is used to retrieve the quoteNotifier using makeQuoteNotifier method, and update the price using setPrice method.
+Aşağıdaki [ölçeklendirilmiş fiyat yetkilisi](https://github.com/Agoric/agoric-sdk/blob/b36fcb2d832ec154019cb6ae0a5dda17f94207eb/packages/zoe/test/unitTests/contracts/test-scaledPriceAuthority.js#L83) testi, nasıl yapılacağını gösterir "makeManualPriceAuthority" işlevini kullanın. makeManualPriceAuthority(), makeQuoteNotifier yöntemini kullanarak quoteNotifier'ı almak ve setPrice yöntemini kullanarak fiyatı güncellemek için kullanılan bir manualPriceAuthority, "sourcePriceAuthority" döndürür.
 
 ```js
 test("scaled price authority", /** @param {ExecutionContext} t */ async (t) => {
